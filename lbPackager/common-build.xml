@@ -53,6 +53,7 @@
         <ivy:resolve refresh="true" conf="default,test"/>
     	<ivy:cachepath pathid="compile.classpath" conf="default" />
     	<ivy:cachepath pathid="test.classpath" conf="default,test" />
+        <ivy:report/>
     </target>
     
     <target name="ivy:clean" depends="clean:dependencies" description="Clean">
@@ -287,5 +288,5 @@
 	</target>
 
 	<target name="all" depends="publish"/>
-	
+
 </project>

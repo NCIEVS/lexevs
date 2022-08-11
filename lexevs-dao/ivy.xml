@@ -49,7 +49,6 @@
 		<dependency org="org.springframework" name="spring-orm" rev="5.3.19" conf="default"/>
 		<dependency org="org.springframework.retry" name="spring-retry" rev="1.3.2" conf="default" />
 		<dependency org="org.springframework" name="spring-tx" rev="5.3.19" conf="default" />
-		<dependency org="org.springframework" name="spring-asm" rev="3.1.4.RELEASE" conf="default" />
 		<dependency org="org.springframework" name="spring-expression" rev="5.3.19" conf="default" />
 		<dependency org="org.springframework" name="spring-context-support" rev="5.3.19" conf="default" />
 		<dependency org="org.springframework.batch" name="spring-batch-core" rev="4.3.5" conf="default" />
