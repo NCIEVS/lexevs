@@ -74,3 +74,13 @@ lbGUI/protege.properties
 
 
 *.'yyyy-MM-dd
+
+*/ivy-report.css
+
+lexevs-*-default.html
+
+lexevs-*-test.html
+
+lexevs-*-default.graphml
+
+lexevs-*-test.graphml
