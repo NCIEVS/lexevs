@@ -18,12 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class StepCompletionListenerTest extends LoaderFrameworkCoreTestBase
 {
 	@Autowired
-	private StepCompletionListener stepCompletionListener;
+	private StepCompletionListener stepComplListener;
 	
 	@Test
 	public void testStepListener()
 	{
-		assertNotNull(stepCompletionListener);
+		assertNotNull(stepComplListener);
 	}
 	
 	
