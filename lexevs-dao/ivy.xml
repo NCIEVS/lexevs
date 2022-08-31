@@ -86,7 +86,8 @@
    		<dependency org="commons-io" name="commons-io" rev="2.6" conf="default" />
    	    <dependency org="commons-dbcp" name="commons-dbcp" rev="1.4" conf="default" />
    	    <dependency org="commons-logging" name="commons-logging" rev="1.1.1" conf="default"/>	
-   	   	<dependency org="javax.persistence" name="javax.persistence-api" rev="2.2" conf="default->*"/>  
+   	   	<dependency org="javax.persistence" name="javax.persistence-api" rev="2.2" conf="default->*"/>
+   	   	<dependency org="javax.inject" name="javax.inject" rev="1" conf="default"/> 
    	    <dependency org="org.mockito" name="mockito-all" rev="1.10.8" conf="default"/>
    	    <dependency org="org.jdom" name="jdom" rev="1.1" conf="default->*"/>
   		<dependency org="commons-codec" name="commons-codec" rev="1.10" conf="default"/>
