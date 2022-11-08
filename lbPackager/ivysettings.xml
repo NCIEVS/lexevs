@@ -5,7 +5,8 @@
 		
 	<property name="ncimvn.snapshots.repo" value="https://ncimvn.nci.nih.gov/nexus/content/repositories/LexEVS3rdParty" />
 	<property name="ncimvn.releases.repo" value="https://ncimvn.nci.nih.gov/nexus/content/repositories/LexEVSRelease" />
-	<property name="ncimvn.thirdparty.repo" value="https://ncimvn.nci.nih.gov/nexus/content/repositories/LexEVS3rdParty" /> 
+	<property name="ncimvn.thirdparty.repo" value="https://ncimvn.nci.nih.gov/nexus/content/repositories/LexEVS3rdParty" />
+	<property name="ncimvn.public.repo" value="https://ncimvn.nci.nih.gov/nexus/content/repositories/public" />
 	
 	<settings defaultResolver="nci-chain" />
 	<caches defaultCacheDir="${user.home}/.ivy2" useOrigin="true"/>
@@ -66,10 +67,13 @@
      			 <artifact pattern="${ivy.project.dir}/../lgSharedLibraries/eclipse/[organisation]/[artifact]_[revision].[ext]" />
     		</filesystem>
 
+			<ibiblio name="ncimvn-public" m2compatible="true" root="https://ncimvn.nci.nih.gov/nexus/content/repositories/public/"/>
+
       		<url name="maven-central" m2compatible="true">
       			  <artifact pattern="https://repo1.maven.org/maven2/[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]"/>
       		</url>
-      		    <ibiblio name="ncimvn-thirdparty-works" m2compatible="true" root="https://ncimvn.nci.nih.gov/nexus/content/repositories/LexEVS3rdParty/"/>	
+
+      		<ibiblio name="ncimvn-thirdparty-works" m2compatible="true" root="https://ncimvn.nci.nih.gov/nexus/content/repositories/LexEVS3rdParty/"/>
 		</chain>
 	</resolvers>
 </ivysettings>
