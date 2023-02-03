@@ -581,7 +581,7 @@ You may obtain a copy of the License at
 			<fileset dir="${basedir}/bvt" includes="**/*.java"/>
 		</copy>
 		<antcall target="temp-scrub"/>
-		<antcall target="temp-compile"/>
+<!--		<antcall target="temp-compile"/>-->
 		
 		<jar destfile="${pkg-test}/lbTest.jar" update="true" >
 		    <fileset dir="${temp.bin}">
