@@ -67,7 +67,8 @@ You may obtain a copy of the License at
 <!--		<property name="lbGui.dir" location="../lbGUI"/>	-->
 		<property name="lbTest" value="../lbTest" />
 		
-<!--		<property name="libs" value="${lgSharedLibs.dir}"/> &lt;!&ndash; shared libs &ndash;&gt;-->
+		<property name="libs" value="${lgSharedLibs.dir}"/> <!-- shared libs -->
+		<property name="junit.libs.dir" value="${libs}/junit"/> <!-- Dependency jars -->
 <!--		<property name="jena.libs.dir" value="${libs}/jena"/> &lt;!&ndash; Dependency jars &ndash;&gt;-->
 <!--		<property name="apache.libs.dir" value="${libs}/apache"/> &lt;!&ndash; Dependency jars &ndash;&gt;-->
 <!--		<property name="gui.libs.dir" value="${libs}/eclipse/swt"/> &lt;!&ndash; Dependency jars &ndash;&gt;-->
@@ -132,7 +133,7 @@ You may obtain a copy of the License at
 		<property name="pkg-source" location="${pack.dir}/source"/>
 		<property name="pkg-admin" location="${pack.dir}/admin"/>
 		<property name="pkg-test" location="${pack.dir}/test"/>
-		<property name="pkg-gui" location="${pack.dir}/gui"/>
+<!--		<property name="pkg-gui" location="${pack.dir}/gui"/>-->
 		
 		<!--set up a conditional to detect the presence of a ydoc license-->
 		<condition property="ydoc.present">
@@ -577,9 +578,9 @@ You may obtain a copy of the License at
 		</copy>
 		
 		<antcall target="temp-clean"/>
-		<copy todir="${temp.src}">
-			<fileset dir="${basedir}/bvt" includes="**/*.java"/>
-		</copy>
+<!--		<copy todir="${temp.src}">-->
+<!--			<fileset dir="${basedir}/bvt" includes="**/*.java"/>-->
+<!--		</copy>-->
 		<antcall target="temp-scrub"/>
 <!--		<antcall target="temp-compile"/>-->
 		
@@ -596,12 +597,12 @@ You may obtain a copy of the License at
 		</copy>
 
 		<copy file="${file.dir}/epljar.license.txt" tofile="${pkg-test}/lbTest.license.txt"/>
-		<copy todir="${pkg-test}">
-			<!-- Required library -->
-			<fileset dir="${basedir}/bvt" includes="extlib/**/*"/>
-			<!-- Distribute scripts adjusted for user install environment. -->
-			<fileset dir="${basedir}/bvt/deploy" includes="**/*"/>
-		</copy>
+<!--		<copy todir="${pkg-test}">-->
+<!--			&lt;!&ndash; Required library &ndash;&gt;-->
+<!--			<fileset dir="${basedir}/bvt" includes="extlib/**/*"/>-->
+<!--			&lt;!&ndash; Distribute scripts adjusted for user install environment. &ndash;&gt;-->
+<!--			<fileset dir="${basedir}/bvt/deploy" includes="**/*"/>-->
+<!--		</copy>-->
 		<!-- Add test data -->
 		<mkdir dir="${pkg-test}/resources"/>
 		<copy todir="${pkg-test}/resources">
@@ -764,10 +765,10 @@ java -Xmx1000M -XX:MaxPermSize=256M -Djava.library.path=linux/ -cp lbGUI.jar:lin
         	<zipgroupfileset file="${pkg-extlib}/*.jar" />		
 		</jar>
 		
-		<jar destfile="${dist.dir}/LexEVS_localRuntime_dependencies.jar" zip64Mode="always" 
-			basedir="${spring.libs.dir}"
-			includes="META-INF/*"
-			update="true"/>
+<!--		<jar destfile="${dist.dir}/LexEVS_localRuntime_dependencies.jar" zip64Mode="always" -->
+<!--			basedir="${spring.libs.dir}"-->
+<!--			includes="META-INF/*"-->
+<!--			update="true"/>-->
 
 		<!--jar jarfile="${pkg-runtime}/lbRuntime.jar" filesetmanifest="merge" duplicate="preserve">
 			<manifest>
@@ -778,14 +779,14 @@ java -Xmx1000M -XX:MaxPermSize=256M -Djava.library.path=linux/ -cp lbGUI.jar:lin
 		</jar-->
 		
 		<mkdir dir="${pkg-runtime}/sqlDrivers"/>
-		<copy todir="${pkg-runtime}/sqlDrivers">
-		<!--including just the toplevel skips the restricted license jars-->
-			<fileset dir="${sql.libs.dir}">
-					<include name="*.jar"/>
-					<include name="*.txt"/>
-					<include name="*.html"/>
-			</fileset>
-		</copy>
+<!--		<copy todir="${pkg-runtime}/sqlDrivers">-->
+<!--		&lt;!&ndash;including just the toplevel skips the restricted license jars&ndash;&gt;-->
+<!--			<fileset dir="${sql.libs.dir}">-->
+<!--					<include name="*.jar"/>-->
+<!--					<include name="*.txt"/>-->
+<!--					<include name="*.html"/>-->
+<!--			</fileset>-->
+<!--		</copy>-->
 		
 		<!-- copy the lexbig.jar to the dist dir and rename it to the versioned name. --> 
 		<copy toFile="${dist.dir}/lexbig-${vBuild}.jar" file="${pkg-components}/lexbig.jar" overwrite="true"/>
@@ -822,8 +823,12 @@ java -Xmx1000M -XX:MaxPermSize=256M -Djava.library.path=linux/ -cp lbGUI.jar:lin
 				 	<include name="lbconfig.props"/>
 				</fileset>
 		</copy>-->
+		<path id="junitPath">
+			<pathelement location="${junit.libs.dir}/junit-*.jar"/>
+		</path>
 	  	<junit haltonerror="false" errorProperty="test.failed" failureProperty="test.failed" dir="antbuild/test" fork="true" forkmode="perTest" showoutput="true">
-<!--				<classpath refid="master.classpath"/>-->
+				<classpath refid="junitPath"/>
+
 	  		<test 	name="org.LexGrid.LexBIG.Impl.testUtility.AllTestsNormalConfig" 
 				todir="../lbPackager/junit-results">
 	  		</test>	 
@@ -933,29 +938,29 @@ java -Xmx1000M -XX:MaxPermSize=256M -Djava.library.path=linux/ -cp lbGUI.jar:lin
 	</target>
 
 	 <!-- depends="lexbig.jar, javadoc" -->
-		<target name="pack.for.bda"  description="generate the jar file" >
-			<!-- Create the izPack config file; alter to match version -->
-			<copy file="${file.dir}/izpack-lexbig.xml" tofile="${basedir}/izpack-install.xml" overwrite="true"/>
-			<replace file="${basedir}/izpack-install.xml" token="@@REPLACED_BY_BUILD_APPNAME@@" value="${prodTitle}"/>
-			<replace file="${basedir}/izpack-install.xml" token="@@REPLACED_BY_BUILD_APPSUBPATH@@" value="LexGrid/${prodID}/${vBuild}"/>
-			<replace file="${basedir}/izpack-install.xml" token="@@REPLACED_BY_BUILD_APPVERSION@@" value="${vBuild}"/>
-			<replace file="${basedir}/izpack-install.xml" token="@@REPLACED_BY_BUILD_INFO_URL@@"
-				value="http://informatics.mayo.edu/LexGrid/index.php?page=${prodID}"/>
-			
-			<replace file="${file.dir}/config-lexbig.props" token="DB_URL=jdbc:mysql://localhost/" value = "DB_URL=jdbc:mysql://ncias-c112-v.nci.nih.gov/"/>
-			<replace file="${file.dir}/config-lexbig.props" token="DB_USER=root" value = "DB_USER=hudson"/>
-			<replace file="${file.dir}/config-lexbig.props" token="DB_PASSWORD=" value = "DB_PASSWORD=hudson_mysql"/>
-			<!-- Create the izPack installer -->
-			<izPack input="${basedir}/izpack-install.xml"
-				output="${out.file}"
-				installerType="standard" basedir="${basedir}"
-			/>
-			<!-- Set up the command-line file to drive izPack installation; alter to match version -->
-			<property name="cmdLineInstallFile" value="${prodID}-install-config-${vBuild}.xml"/>
-			<copy file="${file.dir}/izpack-lexbig-cmdline-install.xml" tofile="${dist.dir}/${cmdLineInstallFile}"/>
-			<replace file="${dist.dir}/${cmdLineInstallFile}" token="@@REPLACED_BY_BUILD_INSTALLPATH@@" value="/usr/local/hudson/LexGrid/${prodID}/${vBuild}"/>
-			<replace file="${dist.dir}/${cmdLineInstallFile}" token="@@REPLACED_BY_BUILD_PRODID@@" value="${prodID}"/>
-		</target>
+<!--		<target name="pack.for.bda"  description="generate the jar file" >-->
+<!--			&lt;!&ndash; Create the izPack config file; alter to match version &ndash;&gt;-->
+<!--			<copy file="${file.dir}/izpack-lexbig.xml" tofile="${basedir}/izpack-install.xml" overwrite="true"/>-->
+<!--			<replace file="${basedir}/izpack-install.xml" token="@@REPLACED_BY_BUILD_APPNAME@@" value="${prodTitle}"/>-->
+<!--			<replace file="${basedir}/izpack-install.xml" token="@@REPLACED_BY_BUILD_APPSUBPATH@@" value="LexGrid/${prodID}/${vBuild}"/>-->
+<!--			<replace file="${basedir}/izpack-install.xml" token="@@REPLACED_BY_BUILD_APPVERSION@@" value="${vBuild}"/>-->
+<!--			<replace file="${basedir}/izpack-install.xml" token="@@REPLACED_BY_BUILD_INFO_URL@@"-->
+<!--				value="http://informatics.mayo.edu/LexGrid/index.php?page=${prodID}"/>-->
+<!--			-->
+<!--			<replace file="${file.dir}/config-lexbig.props" token="DB_URL=jdbc:mysql://localhost/" value = "DB_URL=jdbc:mysql://ncias-c112-v.nci.nih.gov/"/>-->
+<!--			<replace file="${file.dir}/config-lexbig.props" token="DB_USER=root" value = "DB_USER=hudson"/>-->
+<!--			<replace file="${file.dir}/config-lexbig.props" token="DB_PASSWORD=" value = "DB_PASSWORD=hudson_mysql"/>-->
+<!--			&lt;!&ndash; Create the izPack installer &ndash;&gt;-->
+<!--			<izPack input="${basedir}/izpack-install.xml"-->
+<!--				output="${out.file}"-->
+<!--				installerType="standard" basedir="${basedir}"-->
+<!--			/>-->
+<!--			&lt;!&ndash; Set up the command-line file to drive izPack installation; alter to match version &ndash;&gt;-->
+<!--			<property name="cmdLineInstallFile" value="${prodID}-install-config-${vBuild}.xml"/>-->
+<!--			<copy file="${file.dir}/izpack-lexbig-cmdline-install.xml" tofile="${dist.dir}/${cmdLineInstallFile}"/>-->
+<!--			<replace file="${dist.dir}/${cmdLineInstallFile}" token="@@REPLACED_BY_BUILD_INSTALLPATH@@" value="/usr/local/hudson/LexGrid/${prodID}/${vBuild}"/>-->
+<!--			<replace file="${dist.dir}/${cmdLineInstallFile}" token="@@REPLACED_BY_BUILD_PRODID@@" value="${prodID}"/>-->
+<!--		</target>-->
 	
 	<!-- package lexevs and it's dependencies seperately -->
 	<target name="lexevs.pack" depends="lexbig.jar">
