@@ -1890,38 +1890,16 @@
         </if>
 
 
-        <if test="sortList != null and sortList.size > 0">
-            <foreach collection="sortList" item="item">
-
-                <if test="item.getColumnSortType().getName() == &quot;QUALIFIER&quot; and item.getQualifierName() != null and item.getTableAlias() !=null">
-                    (#{item})
-                    LEFT JOIN
-                    ${prefix}entityAssnQuals #{item.getTableAlias}
-                    ON (
-                    eate.entityAssnsGuid = #{item.getTableAlias}.referenceGuid
+  <if test="sortList != null and sortList.size > 0">
+  			LEFT JOIN ${prefix}entityAssnQuals quals ON
+            <foreach collection="sortList" item="item" index="index" open="(" separator="," close=")" >
+                <if test="item.getColumnSortType().getName() == &quot;QUALIFIER&quot; and item.getQualifierName() != null">
+                    eate.entityAssnsGuid = quals.referenceGuid
                     AND
-                    ${item.getTableAlias}.qualifierName = #{item.qualifierName}
-                    AND
-                    ${item.tableAlias}.qualifierValue =
-                    (SELECT
-                    <if test="item.order == ASC">
-                        MAX(
-                    </if>
-                    <if test="item.order == DESC">
-                        MIN(
-                    </if>
-                    maxQual.qualifierValue)
-                    FROM
-                    ${prefix}entityAssnQuals maxQual
-                    WHERE
-                    maxQual.referenceGuid = eate.entityAssnsGuid
-                    AND
-                    maxQual.qualifierName = #{item.qualifierName}
-                    )
-                    )
-                </if>
+                    quals.qualifierName = #{item.qualifierName}
+                </if> 
             </foreach>
-        </if>
+        </if>    
 
         WHERE
         rel.codingSchemeGuid = #{mappingCodingSchemeUid}
@@ -1931,7 +1909,8 @@
 
     <sql id="getTripleUidsForMappingContainerPost">
         <if test="sortList != null and sortList.size > 0 and sortList.get(0).getColumnSortType().getName() == &quot;QUALIFIER&quot;">
-            <foreach collection="sortList" item="item" open="ORDER BY" separator=",">
+        ORDER BY
+            <foreach collection="sortList" item="item">
 			<if test="item.getColumnSortType().getName() == &quot;QUALIFIER&quot;">
                 <if test="item.getQualifierName() !=null">
                     ${item.columnSortType.mappingColumn}
