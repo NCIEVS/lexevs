@@ -15,7 +15,7 @@ You may obtain a copy of the License at
 
  		http://www.eclipse.org/legal/epl-v10.html
 -->
-<project name="LexBIG TestRunner" default="bvt-html" basedir=".">
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="LexBIG TestRunner" default="bvt-html" basedir=".">
 	<description>
 		Verification test suite for LexBIG packages.
 	</description>
@@ -24,32 +24,44 @@ You may obtain a copy of the License at
 		<format property="report.time" pattern="yyyy-MM-dd.HH-mm-ss"/>
 	</tstamp>
 	<property name="output.dir" location="${basedir}/report.${report.time}"/>
-		 	
-	<target name="init">
-		<path id="junit.path">
-			<fileset dir="${basedir}/extlib/ant">
-				<include name="ant-junit-*.jar"/>
-				<include name="ant-trax-*.jar"/>
-			</fileset>
-			<fileset dir="${basedir}/extlib/junit">
-				<include name="junit-*.jar"/>
-			</fileset>
-		</path>
 
-		<taskdef name="junit" classpathref="junit.path"
-			classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
-		</taskdef>
-		<taskdef name="junitreport" classpathref="junit.path"
-			classname="org.apache.tools.ant.taskdefs.optional.junit.XMLResultAggregator">
-		</taskdef>
+	<target name="resolve" description="retrieve dependencies with ivy">
+		<ivy:retrieve />
+		<ivy:cachepath pathid="compile.path" conf="compile" />
+		<ivy:cachepath pathid="runtime.path" conf="runtime" />
+		<ivy:cachepath pathid="test.path" conf="test" />
+
+	</target>
+
+
+
+
+
+	<target name="init">
+<!--		<path id="junit.path">-->
+<!--			<fileset dir="${basedir}/extlib/ant">-->
+<!--				<include name="ant-junit-*.jar"/>-->
+<!--				<include name="ant-trax-*.jar"/>-->
+<!--			</fileset>-->
+<!--			<fileset dir="${basedir}/extlib/junit">-->
+<!--				<include name="junit-*.jar"/>-->
+<!--			</fileset>-->
+<!--		</path>-->
+
+<!--		<taskdef name="junit" classpathref="junit.path"-->
+<!--			classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">-->
+<!--		</taskdef>-->
+<!--		<taskdef name="junitreport" classpathref="junit.path"-->
+<!--			classname="org.apache.tools.ant.taskdefs.optional.junit.XMLResultAggregator">-->
+<!--		</taskdef>-->
 
 		<path id="test.classpath">
 			<fileset dir="${basedir}">
 				<include name="lbTest.jar"/>
 			</fileset>
-			<fileset dir="${basedir}/../runtime-components/extLib">
-				<include name="*"/>
-			</fileset>
+<!--			<fileset dir="${basedir}/../runtime-components/extLib">-->
+<!--				<include name="*"/>-->
+<!--			</fileset>-->
 		</path>
 	</target>
 
@@ -82,6 +94,12 @@ You may obtain a copy of the License at
 	</target>
 			
 	<!-- XML format -->
+
+	<property name="libs" value="../../../../../lib"/> <!-- shared libs -->
+	<property name="junit.libs.dir" value="${libs}/default/jar/junit-*.jar"/>
+	<path id="junitPath">
+		<pathelement location="${junit.libs.dir}/junit-*.jar"/>
+	</path>
 	<target name="bvt-xml" depends="clean" description="task to run the LexBIG test suite and produce a report with extensive information for each test case in xml format">
 		<junit printsummary="true" haltonfailure="false">
 			<jvmarg value="-Dfile.encoding=UTF-8"/>

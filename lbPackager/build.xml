@@ -341,7 +341,9 @@ You may obtain a copy of the License at
 		<delete file="${out.file}"/>
 		<delete dir="${temp.dir}"/>
 		<delete dir="${pack.dir}"/>
+		<delete dir="${basedir}/lib"/>
 		<!-- Create the directory structure for a new build -->
+		<mkdir dir="${basedir}/lib"/>
 		<mkdir dir="${dist.dir}"/>
 		<delete dir="${dist.dir}" includes="**/*"/>
 		<mkdir dir="${temp.dir}"/>
@@ -353,6 +355,7 @@ You may obtain a copy of the License at
 		<mkdir dir="${pkg-components}"/>
 		<mkdir dir="${pkg-doc}"/>
 		<mkdir dir="${pkg-examples}"/>
+		<delete dir="${pkg-extlib}"/>
 		<mkdir dir="${pkg-extlib}"/>
 		<mkdir dir="${pkg-javadoc}"/>
 		<mkdir dir="${pkg-root}"/>
@@ -410,7 +413,7 @@ You may obtain a copy of the License at
 <!--	</target>-->
 
 	
-	<target name="predef" description="copy predefined content to the build directory">
+	<target name="predef" depends="init" description="copy predefined content to the build directory">
         <!-- Config files -->
 		<copy toFile="${pkg-resources-config}/lbconfig.props" file="${file.dir}/config-lexbig.props"/>
 		<copy toDir="${pkg-resources}" file="${lbTest}/resources/testData/SystemReleaseHistory.txt"/>
@@ -442,11 +445,11 @@ You may obtain a copy of the License at
 		
 	</target>	
 	
-	<target name="predef-cbio" depends="predef" description="copy predefined content specific to cBIO projects">
-		<copy toFile="${pkg-resources-config}/lbconfig.props" file="${file.dir}/config-lexbio.props" overwrite="true"/>
-		<!--copy toFile="${pkg-root}/readme.txt" file="${file.dir}/readme-lexbio.txt" overwrite="true"/-->
-		<copy toFile="${basedir}/langsel-image.png" file="${file.dir}/langsel-image-lexbio.png" overwrite="true"/>
-	</target>	
+<!--	<target name="predef-cbio" depends="predef" description="copy predefined content specific to cBIO projects">-->
+<!--		<copy toFile="${pkg-resources-config}/lbconfig.props" file="${file.dir}/config-lexbio.props" overwrite="true"/>-->
+<!--		&lt;!&ndash;copy toFile="${pkg-root}/readme.txt" file="${file.dir}/readme-lexbio.txt" overwrite="true"/&ndash;&gt;-->
+<!--		<copy toFile="${basedir}/langsel-image.png" file="${file.dir}/langsel-image-lexbio.png" overwrite="true"/>-->
+<!--	</target>	-->
 
 	<target name="lgModel" description="packages the LexGrid model.">
 		<antcall target="common-project-build">
@@ -730,6 +733,7 @@ java -Xmx1000M -XX:MaxPermSize=256M -Djava.library.path=linux/ -cp lbGUI.jar:lin
 		
 		<antcall target="temp-clean"/>
 		<ant dir="${lexevs.api.dir}/${project}" antfile="${lexevs.api.dir}/${project}/build.xml" target="${subproject.build.target}"/>
+
 		<copy todir="${temp.pkg}">
 			<fileset dir="${lexevs.api.dir}/${project}/target/">
 			    <include name="${module}-*.jar"/>
