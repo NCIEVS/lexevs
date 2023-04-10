@@ -864,7 +864,7 @@ java -Xmx1000M -XX:MaxPermSize=256M -Djava.library.path=linux/ -cp lbGUI.jar:lin
 				</fileset>
 		</copy>
 	  	<junit haltonerror="false" errorProperty="test.failed" failureProperty="test.failed" dir="antbuild/test" fork="true" forkmode="perTest" showoutput="true">
-				<classpath refid="master.classpath"/>
+<!--				<classpath refid="master.classpath"/>-->
 			<!--
 				Specify the name of the coverage data file to use.
 				The value specified below is the default.
@@ -906,7 +906,7 @@ java -Xmx1000M -XX:MaxPermSize=256M -Djava.library.path=linux/ -cp lbGUI.jar:lin
 			footer="Copyright: (c) 2004-2006 Mayo Foundation for Medical Education and Research (MFMER).  All rights reserved.  MAYO, MAYO CLINIC, and the triple-shield Mayo logo are trademarks and service marks of MFMER."
 			additionalparam="-breakiterator">
 			<package name="*"/>
-			<classpath refid="master.classpath"/>
+<!--			<classpath refid="master.classpath"/>-->
 			<!--classpath path="${pkg-runtime}/lbRuntime.jar" -->
 			<sourcepath>
 				<dirset dir="..">
