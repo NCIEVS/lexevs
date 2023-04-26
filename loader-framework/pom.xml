@@ -31,8 +31,9 @@
      </plugin>
 				
 	 <plugin>
-				 
+		 <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
+		 <version>3.4.2</version>
         <configuration>
           <descriptors>
           <descriptor>src/assembly/bootstrap.xml</descriptor>
@@ -93,13 +94,13 @@
     <dependency>
     	<groupId>commons-collections</groupId>
     	<artifactId>commons-collections</artifactId>
-    	<version>3.2.1</version>
+    	<version>3.2.2</version>
     	<scope>provided</scope>
     </dependency>
     <dependency>
     	<groupId>commons-beanutils</groupId>
     	<artifactId>commons-beanutils</artifactId>
-    	<version>1.8.0</version>
+    	<version>1.9.4</version>
     </dependency>
     <dependency>
     	<groupId>commons-codec</groupId>
@@ -197,19 +198,18 @@
     <dependency>
     	<groupId>commons-io</groupId>
     	<artifactId>commons-io</artifactId>
-    	<version>1.4</version>
-    	<scope>provided</scope>
+    	<version>2.11.0</version>
     </dependency>
     <dependency>
     	<groupId>mysql</groupId>
     	<artifactId>mysql-connector-java</artifactId>
-    	<version>5.1.6</version>
+    	<version>8.0.30</version>
     	<!-- <scope>test</scope> -->
     </dependency>
     <dependency>
     	<groupId>org.jdom</groupId>
-    	<artifactId>jdom</artifactId>
-    	<version>1.1</version>
+    	<artifactId>jdom2</artifactId>
+    	<version>2.0.6.1</version>
     </dependency>
     <dependency>
     	<groupId>org.springframework</groupId>
@@ -222,7 +222,44 @@
     	<artifactId>lucene-regex</artifactId>
     	<version>2.4.1</version>
     </dependency-->
-    
-  
+	  <dependency>
+		  <groupId>com.fasterxml.jackson.core</groupId>
+		  <artifactId>jackson-core</artifactId>
+		  <version>2.14.2</version>
+	  </dependency>
+	  <dependency>
+		  <groupId>com.fasterxml.jackson.core</groupId>
+		  <artifactId>jackson-annotations</artifactId>
+		  <version>2.14.2</version>
+	  </dependency>
+	  <dependency>
+		  <groupId>com.fasterxml.jackson.core</groupId>
+		  <artifactId>jackson-databind</artifactId>
+		  <version>2.14.2</version>
+	  </dependency>
   </dependencies>
+
+	<repositories>
+		<repository>
+			<id>nci.maven.releases</id>
+			<name>NCI Maven Release Repository</name>
+			<url>https://ncimvn.nci.nih.gov/nexus/content/repositories/LexEVSRelease</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>nci.maven.thirdparty</id>
+			<name>NCI Maven 3rd Party Repository</name>
+			<url>https://ncimvn.nci.nih.gov/nexus/content/repositories/LexEVS3rdParty</url>
+		</repository>
+		<repository>
+			<id>nci.maven.public</id>
+			<name>NCI Maven public passthrough</name>
+			<url>https://ncimvn.nci.nih.gov/nexus/content/repositories/public</url>
+		</repository>
+	</repositories>
 </project>

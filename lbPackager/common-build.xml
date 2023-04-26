@@ -40,7 +40,7 @@
     <!-- ** IVY TARGETS AND DEPENDENCY PATHS                              ** -->
     <!-- ******************************************************************* -->
 	
-	<property name="ivy.jar" location="${lbPackager.dir}/ivy/lib/ivy-2.3.0.jar" />
+	<property name="ivy.jar" location="${lbPackager.dir}/ivy/lib/ivy-2.5.1.jar" />
 
     <property name="ivy.settings.file" location="${lbPackager.dir}/ivysettings.xml" />
     <property name="ivy.def.file" location="ivy.xml" />
