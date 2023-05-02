@@ -1888,6 +1888,12 @@
             targetEntity.codingSchemeGuid = #{targetCodingSchemeUid}
             ) 
         </if>
+        
+        
+		WHERE
+			rel.codingSchemeGuid = #{mappingCodingSchemeUid}
+		AND
+			rel.containerName = #{relationsContainerName}
   </sql>
 
     <sql id="getTripleUidsForMappingContainerPost">
