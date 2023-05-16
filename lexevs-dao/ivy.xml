@@ -15,7 +15,7 @@
 <!--		<dependency org="apache" name="ddlUtils" rev="1.0-PATCHED" conf="default"/>-->
 		<dependency org="args4j" name="args4j" rev="2.33" conf="default"/>
 		<dependency org="oro" name="oro" rev="2.0.8" conf="default"/>
-		<dependency org="org.apache.commons" name="commons-digester3" rev="3.2" conf="default"/>
+		<dependency org="commons-digester" name="commons-digester" rev="1.8" conf="default"/>
 		<dependency org="commons-betwixt" name="commons-betwixt" rev="0.8" conf="default"/>
 		<dependency org="commons-beanutils" name="commons-beanutils" rev="1.9.4" conf="default"/>
 		<dependency org="org.apache.commons" name="commons-lang3" rev="3.12.0" conf="default"/>
@@ -85,10 +85,11 @@
 		<dependency org="org.hsqldb" name="hsqldb" rev="2.7.1" conf="default" />
 		<dependency org="junit" name="junit" rev="4.13.2" force="true" conf="default" /> 
 		<!--<dependency org="org.apache.ibatis" name="ibatis-sqlmap" rev="2.3.4.726" conf="default"/>-->
+		<dependency org="org.apache.ant" name="ant" rev="1.10.13" conf="default"/>
    		<dependency org="org.antlr" name="antlr4" rev="4.11.1" conf="default"/>
    		<dependency org="org.dbunit" name="dbunit" rev="2.7.3" conf="default"/>
    		<dependency org="commons-io" name="commons-io" rev="2.11.0" conf="default" />
-   	    <dependency org="org.apache.commons" name="commons-dbcp2" rev="2.9.0" conf="default" />
+		<dependency org="commons-dbcp" name="commons-dbcp" rev="1.4" conf="default" />
    	   	<dependency org="javax.persistence" name="javax.persistence-api" rev="2.2" conf="default->*"/>
    	   	<dependency org="javax.inject" name="javax.inject" rev="1" conf="default"/> 
    	    <dependency org="org.mockito" name="mockito-all" rev="1.10.8" conf="default"/>
