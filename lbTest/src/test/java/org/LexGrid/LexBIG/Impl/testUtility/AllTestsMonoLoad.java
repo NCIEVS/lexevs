@@ -170,6 +170,7 @@ import org.LexGrid.LexBIG.Impl.load.umls.MedRTUmlsCodingSchemeIdSetterTest;
 import org.LexGrid.LexBIG.Impl.namespace.DefaultNamespaceHandlerTest;
 import org.LexGrid.LexBIG.Utility.OrderingTestRunnerTest;
 import org.LexGrid.LexBIG.admin.TestAdminUtilDisplayAndLog;
+import org.LexGrid.lexevs.metabrowser.impl.AllTests;
 import org.LexGrid.loader.dao.template.MedRtCachingSupportedAttributeTemplateTest;
 import org.LexGrid.loader.processor.MedRtEntityAssnsToEntityProcessorTest;
 import org.LexGrid.loader.umls.processor.support.MedRTRelationResolverTest;
@@ -290,6 +291,7 @@ public class AllTestsMonoLoad {
         metaLoaderSuite.addTestSuite(PresentationQualifiersDataTestIT.class);
         metaLoaderSuite.addTestSuite(MetaVersionTestIT.class);
         metaLoaderSuite.addTestSuite(GenericPropertySourceQualifierTestIT.class);
+        metaLoaderSuite.addTest(new JUnit4TestAdapter(AllTests.class));
 
         mainSuite.addTest(metaLoaderSuite);
         
