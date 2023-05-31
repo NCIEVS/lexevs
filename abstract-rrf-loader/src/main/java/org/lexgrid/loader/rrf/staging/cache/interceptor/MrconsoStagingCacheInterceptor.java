@@ -3,7 +3,7 @@ package org.lexgrid.loader.rrf.staging.cache.interceptor;
 
 import java.io.Serializable;
 
-import net.sf.ehcache.Cache;
+import org.ehcache.Cache;
 import net.sf.ehcache.Element;
 
 import org.aopalliance.intercept.MethodInterceptor;

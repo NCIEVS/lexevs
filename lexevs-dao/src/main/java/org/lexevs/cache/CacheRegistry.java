@@ -2,14 +2,20 @@
 package org.lexevs.cache;
 
 import java.io.Serializable;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
+import org.ehcache.Cache;
+import org.ehcache.CacheManager;
+import org.ehcache.config.CacheConfiguration;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.xml.XmlConfiguration;
+
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.statistics.StatisticsGateway;
@@ -20,10 +26,12 @@ import net.sf.ehcache.config.ConfigurationFactory;
 import org.lexevs.logging.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.w3c.dom.NodeList;
 
 public class CacheRegistry implements InitializingBean, DisposableBean {
 	
 	private CacheManager cacheManager;
+	private CacheConfigLocationFactory cacheConfig;
 
 /** The caches. */
 private Map<String,CacheWrapper<String,Object>> caches = new HashMap<String,CacheWrapper<String,Object>>();
@@ -52,7 +60,7 @@ private Map<String,CacheWrapper<String,Object>> caches = new HashMap<String,Cach
 		float memoryUsage = 0;
 
 		for(String cacheName : this.cacheManager.getCacheNames()) {
-			Cache cache = this.cacheManager.getCache(cacheName);
+			org.springframework.cache.Cache cache = this.cacheManager.getCache(cacheName);
 			
 			StatisticsGateway stats = cache.getStatistics();
 			hits += stats.cacheHitCount();
@@ -84,8 +92,14 @@ private Map<String,CacheWrapper<String,Object>> caches = new HashMap<String,Cach
 	}
 	
 	protected void initializeCache() {
-		for(String cacheName : this.cacheManager.getCacheNames()) {
-			this.caches.put(cacheName, new EhCacheWrapper<String,Object>(cacheName, this.cacheManager));
+		final URL myUrl = getClass().getResource(cacheConfig.getObject().getFilename()); 
+		XmlConfiguration xmlConfig = new XmlConfiguration(myUrl); 
+		NodeList list = xmlConfig.asDocument().getChildNodes();
+
+		cacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);
+
+		for(int i = 0; i > list.getLength(); i++) {
+			this.caches.put(list.item(i).cacheName.get, new EhCacheWrapper<String,Object>(cacheName, this.cacheManager));
 		}
 	}
 
