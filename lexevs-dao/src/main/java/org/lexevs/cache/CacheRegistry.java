@@ -48,6 +48,7 @@ private Map<String,CacheWrapper<String,Object>> caches = new HashMap<String,Cach
 	public void destroy() throws Exception {
 		LoggerFactory.getLogger().debug(
 				getCacheStatisticsStringRepresentation());
+		cacheManager.close();
 	}
 	
 	protected String getCacheStatisticsStringRepresentation() {
@@ -92,15 +93,23 @@ private Map<String,CacheWrapper<String,Object>> caches = new HashMap<String,Cach
 	}
 	
 	protected void initializeCache() {
-		final URL myUrl = getClass().getResource(cacheConfig.getObject().getFilename()); 
+		URL myUrl = null;
+		try {
+			myUrl = getClass().getResource(cacheConfig.getObject().getFilename());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
 		XmlConfiguration xmlConfig = new XmlConfiguration(myUrl); 
-		NodeList list = xmlConfig.asDocument().getChildNodes();
+		Map<String, CacheConfiguration<?, ?>> list = xmlConfig.getCacheConfigurations();
 
 		cacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);
+		cacheManager.init();
 
-		for(int i = 0; i > list.getLength(); i++) {
-			this.caches.put(list.item(i).cacheName.get, new EhCacheWrapper<String,Object>(cacheName, this.cacheManager));
-		}
+		list.keySet().forEach(x -> this.caches.put(x, new EhCacheWrapper<String,Object>(x, this.cacheManager)));
+//		for(int i = 0; i > list.getLength(); i++) {
+//			this.caches.put(list.item(i).cacheName.get, new EhCacheWrapper<String,Object>(cacheName, this.cacheManager));
+//		}
 	}
 
 	public void clearAll() {
@@ -123,7 +132,7 @@ private Map<String,CacheWrapper<String,Object>> caches = new HashMap<String,Cach
 							" Cache: " + cacheName + " not found.\n" +
 					"=============================================\n\n");
 				} else {
-					if(this.cacheManager.cacheExists(cacheName)) {
+					if(this.cacheManager.getCache(cacheName, String.class,Object.class) == null) {
 						CacheWrapper<String,Object> cacheWrapper = new EhCacheWrapper<String,Object>(cacheName,this.cacheManager);
 						this.caches.put(cacheName,cacheWrapper);
 						return cacheWrapper;
@@ -174,7 +183,7 @@ private Map<String,CacheWrapper<String,Object>> caches = new HashMap<String,Cach
 		}
 
 		public void put(final K key, final V value){
-			getCache().put(new Element(key, value));
+			getCache().put(key, value));
 		}
 
 		@SuppressWarnings("unchecked")
@@ -211,8 +220,8 @@ private Map<String,CacheWrapper<String,Object>> caches = new HashMap<String,Cach
 			return returnList;
 		}
 
-		public Ehcache getCache(){
-			return cacheManager.getEhcache(cacheName);
+		public Cache getCache(){
+			return cacheManager.getCache(cacheName, String.class, Object.class);
 		}
 	}
 	
