@@ -8,6 +8,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.ehcache.Cache;
@@ -207,6 +210,11 @@ private Map<String,CacheWrapper<String,Object>> caches = new HashMap<String,Cach
 		
 		public List<V> values();
 	}
+	
+	private static <T> Consumer<T> usingCounter(BiConsumer<Integer, T> consumer) {
+	    AtomicInteger counter = new AtomicInteger(0);
+	    return item -> consumer.accept(counter.getAndIncrement(), item);
+	}
 
 	public class EhCacheWrapper<K extends Serializable, V> implements CacheWrapper<K, V> {
 		private final String cacheName;
@@ -218,40 +226,37 @@ private Map<String,CacheWrapper<String,Object>> caches = new HashMap<String,Cach
 		}
 
 		public void put(final K key, final V value){
-			getCache().put(key, value);
+			getCache().put((String) key, value);
 		}
 
 		@SuppressWarnings("unchecked")
 		public V get(final K key){
-			Element element = getCache().get(key);
-			if (element != null) {
-				if(element.isSerializable()) {
-					return (V) element.getValue();
-				} else {
-					return (V) element.getObjectValue();
-				}
+			Object results = getCache().get((String) key);
+			if (results != null) {
+				
+					return (V) results;
 			}
 			return null;
 		}
 		
 		public int size() {
-			return getCache().getSize();
+			AtomicInteger count = new AtomicInteger(0);
+			getCache().forEach(item -> count.incrementAndGet());
+			return count.get();
 		}
 		
+
+		
 		public void clear(){
-			getCache().removeAll();
+			getCache().clear();
 		}
 		
 		@SuppressWarnings("unchecked")
 		public List<V> values(){
 			List<V> returnList = new ArrayList<V>();
 			
-			List<K> keys = getCache().;
-			
-			for(K key : keys) {
-				returnList.add(this.get(key));
-			}
-			
+			getCache().forEach(x -> returnList.add((V) x));
+
 			return returnList;
 		}
 
