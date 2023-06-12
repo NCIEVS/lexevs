@@ -108,7 +108,7 @@ private Map<String,CacheWrapper<String,Object>> caches = new HashMap<String,Cach
 		try {
 			myUrl = getClass().getResource(cacheConfig.getObject().getFilename());
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		} 
 		xmlConfig = new XmlConfiguration(myUrl); 
@@ -118,9 +118,7 @@ private Map<String,CacheWrapper<String,Object>> caches = new HashMap<String,Cach
 		cacheManager.init();
 
 		cacheConfigs.keySet().forEach(x -> this.caches.put(x, new EhCacheWrapper<String,Object>(x, this.cacheManager)));
-//		for(int i = 0; i > list.getLength(); i++) {
-//			this.caches.put(list.item(i).cacheName.get, new EhCacheWrapper<String,Object>(cacheName, this.cacheManager));
-//		}
+
 	}
 
 	public void clearAll() {
@@ -211,10 +209,6 @@ private Map<String,CacheWrapper<String,Object>> caches = new HashMap<String,Cach
 		public List<V> values();
 	}
 	
-	private static <T> Consumer<T> usingCounter(BiConsumer<Integer, T> consumer) {
-	    AtomicInteger counter = new AtomicInteger(0);
-	    return item -> consumer.accept(counter.getAndIncrement(), item);
-	}
 
 	public class EhCacheWrapper<K extends Serializable, V> implements CacheWrapper<K, V> {
 		private final String cacheName;
