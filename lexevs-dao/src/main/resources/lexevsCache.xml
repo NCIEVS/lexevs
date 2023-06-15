@@ -14,9 +14,7 @@
 	<aop:aspectj-autoproxy proxy-target-class="true"/>
 
 	<bean id="cacheConfigLocationFactory" class="org.lexevs.cache.CacheConfigLocationFactory"/>
-	
-	 <bean id="ehCacheManager" class="org.ehcache.CacheManager" ></bean>
-	
+		
 	<bean id="methodCachingProxyAspect" 
 		class="org.lexevs.cache.MethodCachingProxy">
 		<property name="logger" ref="loggerFactory"/>
@@ -33,8 +31,8 @@
 	</bean>
 	
 	<bean id="cacheRegistry" class="org.lexevs.cache.CacheRegistry">
-		<property name="cacheManager" ref="ehCacheManager"/>
-		<property name="cacheConfig" ref="cacheConfigLocationFactory "/>
 	</bean>
+	
+	
 	
 </beans>

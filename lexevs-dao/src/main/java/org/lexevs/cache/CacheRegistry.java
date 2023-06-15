@@ -29,12 +29,22 @@ import org.ehcache.xml.XmlConfiguration;
 import org.lexevs.logging.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.NodeList;
 
 public class CacheRegistry implements InitializingBean, DisposableBean {
 	
 	private CacheManager cacheManager;
+	@Autowired
 	private CacheConfigLocationFactory cacheConfig;
+	public CacheConfigLocationFactory getCacheConfig() {
+		return cacheConfig;
+	}
+
+	public void setCacheConfig(CacheConfigLocationFactory cacheConfig) {
+		this.cacheConfig = cacheConfig;
+	}
+
 	private StatisticsService statisticsService;
 	private XmlConfiguration xmlConfig;
 	Map<String, CacheConfiguration<?, ?>> cacheConfigs;
