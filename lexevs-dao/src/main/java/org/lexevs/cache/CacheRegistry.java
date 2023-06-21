@@ -1,6 +1,7 @@
 
 package org.lexevs.cache;
 
+import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
@@ -34,9 +35,11 @@ import org.w3c.dom.NodeList;
 
 public class CacheRegistry implements InitializingBean, DisposableBean {
 	
-	private CacheManager cacheManager;
+	private static CacheManager cacheManager;
+	
 	@Autowired
 	private CacheConfigLocationFactory cacheConfig;
+	
 	public CacheConfigLocationFactory getCacheConfig() {
 		return cacheConfig;
 	}
@@ -114,9 +117,10 @@ private Map<String,CacheWrapper<String,Object>> caches = new HashMap<String,Cach
 	}
 	
 	protected void initializeCache() {
+		if(cacheManager != null) {return;} else {
 		URL myUrl = null;
 		try {
-			myUrl = getClass().getResource(cacheConfig.getObject().getFilename());
+			myUrl = cacheConfig.getObject().getURL();
 		} catch (Exception e) {
 
 			e.printStackTrace();
@@ -128,7 +132,7 @@ private Map<String,CacheWrapper<String,Object>> caches = new HashMap<String,Cach
 		cacheManager.init();
 
 		cacheConfigs.keySet().forEach(x -> this.caches.put(x, new EhCacheWrapper<String,Object>(x, this.cacheManager)));
-
+		}
 	}
 
 	public void clearAll() {
