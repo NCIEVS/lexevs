@@ -13,10 +13,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.config.CacheConfiguration;
+import org.ehcache.config.ResourcePools;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
@@ -53,7 +55,7 @@ public class CacheRegistry implements InitializingBean, DisposableBean {
 	Map<String, CacheConfiguration<?, ?>> cacheConfigs;
 
 /** The caches. */
-private Map<String,CacheWrapper<String,Object>> caches = new HashMap<String,CacheWrapper<String,Object>>();
+ private Map<String,Cache<String,Object>> caches = new HashMap<String,Cache<String,Object>>();
 
 
 	private final ThreadLocal<Boolean> inCacheClearingState =
@@ -130,36 +132,40 @@ private Map<String,CacheWrapper<String,Object>> caches = new HashMap<String,Cach
 		this.statisticsService = new DefaultStatisticsService();
 		cacheManager = CacheManagerBuilder.newCacheManagerBuilder().using(statisticsService).newCacheManager(xmlConfig);
 		cacheManager.init();
-
-		cacheConfigs.keySet().forEach(x -> this.caches.put(x, new EhCacheWrapper<String,Object>(x, this.cacheManager)));
+		cacheConfigs.keySet().forEach(x -> this.caches.put(x,this.cacheManager.getCache(x, String.class, Object.class)));
 		}
 	}
 
 	public void clearAll() {
-		for(CacheWrapper<String,Object> cache : this.caches.values()) {
-			cache.clear();
-		}
+		List<String> caches = cacheManager.getRuntimeConfiguration().getCacheConfigurations().keySet().stream().collect(Collectors.toList());
+		caches.stream().forEach(x -> cacheManager.getCache(x, String.class, Object.class).clear());
+
 	}
 	
-	public Map<String, CacheWrapper<String, Object>> getCaches() {
+	public Map<String, Cache<String, Object>> getCaches() {
 		return Collections.unmodifiableMap(this.caches);
 	}
 
-	public CacheWrapper<String, Object> getCache(String cacheName, boolean createIfNotPresent) {
-		synchronized(caches) {
-			if(! caches.containsKey(cacheName)) {
-				if(!createIfNotPresent){
-					throw new RuntimeException("\n\n\n" +
-							"=============================================\n" +
-							"                Cache Error\n" +
-							" Cache: " + cacheName + " not found.\n" +
-					"=============================================\n\n");
-				} else {
-					if(this.cacheManager.getCache(cacheName, String.class,Object.class) == null) {
-						CacheWrapper<String,Object> cacheWrapper = new EhCacheWrapper<String,Object>(cacheName,this.cacheManager);
-						this.caches.put(cacheName,cacheWrapper);
-						return cacheWrapper;
-					} else {
+	public Cache<String, Object> getCache(String cacheName, boolean createIfNotPresent) {
+//		synchronized(caches) {
+//			if(! (cacheManager.getCache(cacheName, String.class, Object.class) == null)) {
+//				if(!createIfNotPresent){
+//					throw new RuntimeException("\n\n\n" +
+//							"=============================================\n" +
+//							"                Cache Error\n" +
+//							" Cache: " + cacheName + " not found.\n" +
+//					"=============================================\n\n");
+////				} else {
+		if(cacheManager.getCache(cacheName, String.class, Object.class) != null) {
+			cacheManager.getCache(cacheName, String.class, Object.class).;
+					return cacheManager.getCache(cacheName, String.class, Object.class);
+		}
+		else {
+//					}
+//						CacheWrapper<String,Object> cacheWrapper = new EhCacheWrapper<String,Object>(cacheName,this.cacheManager);
+//						this.caches.put(cacheName,cacheWrapper);
+//						return this.cacheManager.getCache(cacheName, null, null)
+//					} else {
 						LoggerFactory.getLogger().debug("Using default cache for Cache Name: " + cacheName);
 						
 						CacheConfigurationBuilder<String, Object> configuration =
@@ -188,19 +194,20 @@ private Map<String,CacheWrapper<String,Object>> caches = new HashMap<String,Cach
 							          }
 							        });
 
-						this.cacheManager.createCache(cacheName, configuration.build());
+						Cache<String,Object> cache = this.cacheManager.createCache(cacheName, configuration.build());
+//
+//						CacheWrapper<String,Object> cacheWrapper = 
+//							new EhCacheWrapper<String,Object>(cacheName,this.cacheManager);
+//						cacheManager.put(cacheName,value);
 
-						CacheWrapper<String,Object> cacheWrapper = 
-							new EhCacheWrapper<String,Object>(cacheName,this.cacheManager);
-						this.caches.put(cacheName,cacheWrapper);
-
-						return cacheWrapper;
+						return cache;
 					}
-				}
-			}
-			return this.caches.get(cacheName);
-		}
 	}
+//				}
+//			}
+//			return this.caches.get(cacheName);
+//		}
+//	}
 
 	public void setCacheManager(CacheManager cacheManager) {
 		this.cacheManager = cacheManager;
@@ -210,68 +217,77 @@ private Map<String,CacheWrapper<String,Object>> caches = new HashMap<String,Cach
 		return cacheManager;
 	}
 
-	public interface CacheWrapper<K, V> 
-	{
-		public void put(K key, V value);
-
-		public V get(K key);
-		
-		public void clear();
-		
-		public int size();
-		
-		public List<V> values();
-	}
-	
-
-	public class EhCacheWrapper<K extends Serializable, V> implements CacheWrapper<K, V> {
-		private final String cacheName;
-		private final CacheManager cacheManager;
-
-		public EhCacheWrapper(final String cacheName, final CacheManager cacheManager){
-			this.cacheName = cacheName;
-			this.cacheManager = cacheManager;
-		}
-
-		public void put(final K key, final V value){
-			getCache().put((String) key, value);
-		}
-
-		@SuppressWarnings("unchecked")
-		public V get(final K key){
-			Object results = getCache().get((String) key);
-			if (results != null) {
-				
-					return (V) results;
-			}
-			return null;
-		}
-		
-		public int size() {
-			AtomicInteger count = new AtomicInteger(0);
-			getCache().forEach(item -> count.incrementAndGet());
-			return count.get();
-		}
-		
-
-		
-		public void clear(){
-			getCache().clear();
-		}
-		
-		@SuppressWarnings("unchecked")
-		public List<V> values(){
-			List<V> returnList = new ArrayList<V>();
-			
-			getCache().forEach(x -> returnList.add((V) x));
-
-			return returnList;
-		}
-
-		public Cache<String, Object> getCache(){
-			return cacheManager.getCache(cacheName, String.class, Object.class);
-		}
-	}
+//	public interface CacheWrapper<K, V> 
+//	{
+//		public void put(K key, V value);
+//
+//		public V get(K key);
+//		
+//		public void clear();
+//		
+//		public int size();
+//		
+//		public List<V> values();
+//	}
+//	
+//
+//	public class EhCacheWrapper<K extends Serializable, V> implements CacheWrapper<K, V> {
+//		private final String cacheName;
+//		private final CacheManager cacheManager;
+//
+//		public EhCacheWrapper(final String cacheName, final CacheManager cacheManager){
+//			this.cacheName = cacheName;
+//			this.cacheManager = cacheManager;
+//		}
+//
+//		public void put(final K key, final V value){
+//			if(cacheManager.getCache(cacheName, key.getClass(), ((Object)value).getClass()) == null)
+//			{
+//				cacheManager.createCache(cacheName, configureDefaultCache(cacheName, key.getClass(),((Object)value).getClass()));
+//			}
+//			getCache().put(cacheName, (String)key, (Object)value);
+//		}
+//
+//		@SuppressWarnings("unchecked")
+//		public V get(final K key, V value){
+//			Object results = getCache(key));
+//			if (results != null) {
+//				
+//					return (V) results;
+//			}
+//			return null;
+//		}
+//		
+//		public int size() {
+//			AtomicInteger count = new AtomicInteger(0);
+//			getCache().forEach(item -> count.incrementAndGet());
+//			return count.get();
+//		}
+//		
+//
+//		
+//		public void clear(){
+//			getCache().clear();
+//		}
+//		
+//		@SuppressWarnings("unchecked")
+//		public List<V> values(){
+//			List<V> returnList = new ArrayList<V>();
+//			
+//			getCache().forEach(x -> returnList.add((V) x));
+//
+//			return returnList;
+//		}
+//
+//		public  Cache<K,V> getCache(){
+//			return (Cache<K, V>) cacheManager.getCache(cacheName, String.class, Object.class);
+//		}
+//		
+//		private CacheConfiguration<? extends Serializable, ? extends Object> configureDefaultCache(String cacheName, Class<? extends Serializable> class1, Class<? extends Object> class2){
+//			ResourcePools pools = ResourcePoolsBuilder.newResourcePoolsBuilder().build();
+//			return CacheConfigurationBuilder.newCacheConfigurationBuilder(class1, class2, pools).build();
+//		}
+//	}
 	
 	public Boolean getInThreadCacheClearingState(){
 		return this.inCacheClearingState.get();
@@ -280,4 +296,6 @@ private Map<String,CacheWrapper<String,Object>> caches = new HashMap<String,Cach
 	public void setInThreadCacheClearingState(boolean inThreadClearingState){
 		this.inCacheClearingState.set(inThreadClearingState);
 	}
+	
+
 }

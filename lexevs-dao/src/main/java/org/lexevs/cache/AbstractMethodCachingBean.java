@@ -11,7 +11,8 @@ import java.util.Map;
 
 import org.LexGrid.LexBIG.Utility.logging.LgLoggerIF;
 import org.apache.commons.lang.ClassUtils;
-import org.lexevs.cache.CacheRegistry.CacheWrapper;
+import org.ehcache.Cache;
+//import org.lexevs.cache.CacheRegistry.CacheWrapper;
 import org.lexevs.cache.annotation.CacheMethod;
 import org.lexevs.cache.annotation.Cacheable;
 import org.lexevs.cache.annotation.ClearCache;
@@ -86,11 +87,11 @@ public abstract class AbstractMethodCachingBean<T> {
 		} else {
 
 			for(String cacheName : clearCacheAnnotation.clearCaches()){
-				CacheWrapper<String,Object> cache = this.getCacheFromName(cacheName, false);
+				Cache<String,Object> cache = this.getCacheFromName(cacheName, false);
 				cache.clear();
 			}
 			
-			CacheWrapper<String,Object> cache = this.getCacheFromName(cacheableAnnotation.cacheName(), false);
+			Cache<String,Object> cache = this.getCacheFromName(cacheableAnnotation.cacheName(), false);
 	
 			cache.clear();
 		}
@@ -137,7 +138,7 @@ public abstract class AbstractMethodCachingBean<T> {
 		Cacheable cacheableAnnotation = AnnotationUtils.findAnnotation(target.getClass(), Cacheable.class);
 		CacheMethod cacheMethodAnnotation = AnnotationUtils.findAnnotation(method, CacheMethod.class);
 	
-		CacheWrapper<String,Object> cache = this.getCacheFromName(
+		Cache<String,Object> cache = this.getCacheFromName(
 				cacheableAnnotation.cacheName(), true);
 
 		if(method.isAnnotationPresent(ClearCache.class)) {
@@ -195,7 +196,7 @@ public abstract class AbstractMethodCachingBean<T> {
 
 	protected abstract Object[] getArguments(T joinPoint);
 	
-	public CacheWrapper<String,Object> getCacheFromName(String cacheName, boolean createIfNotPresent){
+	public Cache<String,Object> getCacheFromName(String cacheName, boolean createIfNotPresent){
 		return this.cacheRegistry.getCache(cacheName, createIfNotPresent);
 	}
 
@@ -276,7 +277,7 @@ public abstract class AbstractMethodCachingBean<T> {
 		return sb.toString();
 	}
 	
-	protected Map<String, CacheWrapper<String, Object>> getCaches(){
+	protected Map<String, Cache<String, Object>> getCaches(){
 		return this.cacheRegistry.getCaches();
 	}
 	
