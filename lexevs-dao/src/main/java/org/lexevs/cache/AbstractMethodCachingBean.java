@@ -69,7 +69,7 @@ public abstract class AbstractMethodCachingBean<T> {
 
 			Object returnObj = this.proceed(joinPoint);
 			
-			clearCache(cacheableAnnotation, clearCacheAnnotation);
+			clearCache(cacheableAnnotation, clearCacheAnnotation, joinPoint);
 
 			return returnObj;
 		} finally {
@@ -81,17 +81,17 @@ public abstract class AbstractMethodCachingBean<T> {
 
 	private void clearCache(
 			Cacheable cacheableAnnotation,
-			ClearCache clearCacheAnnotation) {
+			ClearCache clearCacheAnnotation, T joinPoint) {
 		if(clearCacheAnnotation.clearAll()) {
 			this.cacheRegistry.clearAll();
 		} else {
 
 			for(String cacheName : clearCacheAnnotation.clearCaches()){
-				Cache<String,Object> cache = this.getCacheFromName(cacheName, false);
+				Cache<String,Object> cache = this.getCacheFromName(cacheName, false, joinPoint);
 				cache.clear();
 			}
 			
-			Cache<String,Object> cache = this.getCacheFromName(cacheableAnnotation.cacheName(), false);
+			Cache<String,Object> cache = this.getCacheFromName(cacheableAnnotation.cacheName(), false,joinPoint);
 	
 			cache.clear();
 		}
@@ -139,7 +139,7 @@ public abstract class AbstractMethodCachingBean<T> {
 		CacheMethod cacheMethodAnnotation = AnnotationUtils.findAnnotation(method, CacheMethod.class);
 	
 		Cache<String,Object> cache = this.getCacheFromName(
-				cacheableAnnotation.cacheName(), true);
+				cacheableAnnotation.cacheName(), true, joinPoint);
 
 		if(method.isAnnotationPresent(ClearCache.class)) {
 			return this.clearCache(joinPoint, method);
@@ -196,8 +196,10 @@ public abstract class AbstractMethodCachingBean<T> {
 
 	protected abstract Object[] getArguments(T joinPoint);
 	
-	public Cache<String,Object> getCacheFromName(String cacheName, boolean createIfNotPresent){
-		return this.cacheRegistry.getCache(cacheName, createIfNotPresent);
+	protected abstract Class<Object> getReturnType(T jointPoint);
+	
+	public Cache<String,Object> getCacheFromName(String cacheName, boolean createIfNotPresent, T jointPoint){
+		return this.cacheRegistry.getCache(cacheName, createIfNotPresent, getReturnType(jointPoint));
 	}
 
 	/**

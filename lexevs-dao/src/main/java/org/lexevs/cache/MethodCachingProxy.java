@@ -4,6 +4,7 @@ package org.lexevs.cache;
 import java.lang.reflect.Method;
 
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -42,5 +43,11 @@ public class MethodCachingProxy extends AbstractMethodCachingBean<ProceedingJoin
 	@Override
 	protected Object proceed(ProceedingJoinPoint joinPoint) throws Throwable {
 		return joinPoint.proceed();
+	}
+
+	@Override
+	protected Class<Object> getReturnType(ProceedingJoinPoint jointPoint) {
+		Signature sig = jointPoint.getSignature();
+		return ((MethodSignature)sig).getReturnType();
 	}
 }
