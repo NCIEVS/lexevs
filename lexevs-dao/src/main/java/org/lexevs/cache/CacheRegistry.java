@@ -57,7 +57,7 @@ public class CacheRegistry implements InitializingBean, DisposableBean {
 	Map<String, CacheConfiguration<?, ?>> cacheConfigs;
 
 /** The caches. */
- private Map<String,Cache<String,Object>> caches = new HashMap<String,Cache<String,Object>>();
+// private Map<String,Cache<String,Object>> caches = new HashMap<String,Cache<String,Object>>();
 
 
 	private final ThreadLocal<Boolean> inCacheClearingState =
@@ -135,36 +135,43 @@ public class CacheRegistry implements InitializingBean, DisposableBean {
 
 	}
 	
-	public Map<String, Cache<String, Object>> getCaches() {
-		return Collections.unmodifiableMap(this.caches);
+//	public Map<String, Cache<String, Object>> getCaches() {
+//		return Collections.unmodifiableMap(this.caches);
+//	}
+
+//	public Cache<String, Object> getCache(String cacheName, boolean createIfNotPresent, Class clazz) {
+//			EhcacheFactory<clazz> factory = new org.lexevs.cache.CacheRegistry.EhcacheFactory<clazz>();
+//			return (Cache<String, Object>) factory.getCache(cacheName, String.class, clazz);
+//
+//	}
+	
+	class EhcacheFactory<T>{
+		
+		protected CacheConfigurationBuilder<String, T> getDefaultCacheConfiguration(T type) {
+			Class<T> clazz = (Class<T>) type.getClass();
+			return CacheConfigurationBuilder
+					.newCacheConfigurationBuilder(String.class, clazz, 
+							ResourcePoolsBuilder
+							.heap(100))
+					.withExpiry(
+							ExpiryPolicyBuilder
+							.timeToLiveExpiration(
+									Duration
+									.ofSeconds(600)));
+		}
+		
+		protected Cache<String, T> getCache(String cacheName, boolean createIfNotPresent, T type) {
+			Cache<String, T> cache = (Cache<String, T>) cacheManager.getCache(cacheName, String.class, type.getClass());
+			if(cache != null){
+				return cache;
+			}
+			else {
+				return cacheManager.createCache(cacheName, getDefaultCacheConfiguration(type));
+			}
+		}
+		
 	}
 
-	public Cache<String, Object> getCache(String cacheName, boolean createIfNotPresent, Class<Object> clazz) {
-		if (cacheManager.getCache(cacheName, String.class, clazz) != null) {
-			return (Cache<String, Object>) cacheManager.getCache(cacheName, String.class, clazz);
-		} else {
-			LoggerFactory.getLogger().debug("Using default cache for Cache Name: " + cacheName);
-			CacheConfigurationBuilder<String, Object> configuration = getDefaultCacheConfiguration(clazz);
-			Cache<String, Object> cache = cacheManager
-					.createCache(cacheName, 
-							configuration
-							.build());
-			return cache;
-		}
-	}
-	
-	
-	private CacheConfigurationBuilder<String, Object> getDefaultCacheConfiguration(Class<Object> clazz) {
-		return CacheConfigurationBuilder
-				.newCacheConfigurationBuilder(String.class, clazz, 
-						ResourcePoolsBuilder
-						.heap(100))
-				.withExpiry(
-						ExpiryPolicyBuilder
-						.timeToLiveExpiration(
-								Duration
-								.ofSeconds(600)));
-	}
 
 	public void setCacheManager(CacheManager cManager) {
 		cacheManager = cManager;
