@@ -29,6 +29,7 @@ import org.lexevs.cache.annotation.Cacheable;
 import org.lexevs.cache.annotation.ClearCache;
 import org.lexevs.cache.annotation.ParameterKey;
 import org.lexevs.dao.database.utility.DaoUtility;
+import org.lexevs.logging.LoggerFactory;
 import org.lexevs.system.constants.SystemVariables;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -392,14 +393,7 @@ public abstract class AbstractMethodCachingBean<T> implements InitializingBean, 
 		this.systemVariables = systemVariables;
 	}
 
-//	public void setCacheRegistry(CacheRegistry cacheRegistry) {
-//		this.cacheRegistry = cacheRegistry;
-//	}
-//
-//	public CacheRegistry getCacheRegistry() {
-//		return cacheRegistry;
-//	}
-//	
+
 		
 	public CacheConfigurationBuilder getDefaultCacheConfiguration(T joinPoint) {
 			
@@ -423,5 +417,12 @@ public abstract class AbstractMethodCachingBean<T> implements InitializingBean, 
 				return cacheManager.createCache(cacheName, getDefaultCacheConfiguration(joinPoint));
 			}
 		}
+	
+	@Override
+	public void destroy() throws Exception {
+		LoggerFactory.getLogger().debug(
+				getCacheStatisticsStringRepresentation());
+		cacheManager.close();
+	}
 
 }
