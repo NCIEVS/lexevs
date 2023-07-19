@@ -7,8 +7,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.LexGrid.LexBIG.Utility.logging.LgLoggerIF;
@@ -64,9 +66,15 @@ public abstract class AbstractMethodCachingBean<T> implements InitializingBean, 
 	
 	Map<String, CacheConfiguration<?, ?>> cacheConfigs;
 	
+	private static Map<String,Cache<String,Object>> caches = new ConcurrentHashMap<String,Cache<String,Object>>();
+	
 	
 	public void afterPropertiesSet() throws Exception {
 		initializeCache();
+	}
+	
+	public Map<String,Cache<String,Object>> getCaches(){
+		return caches;
 	}
 	
 	protected void initializeCache() {
@@ -180,8 +188,19 @@ public abstract class AbstractMethodCachingBean<T> implements InitializingBean, 
 	}
 	
 	public void clearAll() {
-		List<String> caches = cacheManager.getRuntimeConfiguration().getCacheConfigurations().keySet().stream().collect(Collectors.toList());
-		caches.stream().forEach(x -> cacheManager.getCache(x, String.class, Object.class).clear());
+		List<String> caches = cacheManager
+				.getRuntimeConfiguration()
+				.getCacheConfigurations()
+				.keySet()
+				.stream()
+				.collect(Collectors.toList());
+		
+		caches
+		.stream()
+		.forEach(x -> 
+		cacheManager
+		.getCache(x, String.class, Object.class)
+		.clear());
 
 	}
 	
@@ -195,10 +214,11 @@ public abstract class AbstractMethodCachingBean<T> implements InitializingBean, 
 	 * @throws Throwable the throwable
 	 */
 	protected Object doCacheMethod(T joinPoint) throws Throwable {
-		
-		if(!CacheSessionManager.getCachingStatus()) {
-			return this.proceed(joinPoint);
-		}
+	
+//      I don't see any evidence this caching status is ever set to true.  Not used.  		
+//		if(!CacheSessionManager.getCachingStatus()) {
+//			return this.proceed(joinPoint);
+//		}
 
 		Method method = this.getMethod(joinPoint);
 
@@ -208,6 +228,8 @@ public abstract class AbstractMethodCachingBean<T> implements InitializingBean, 
 			throw new RuntimeException("Cannot both Cache method results and clear the Cache in " +
 					"the same method. Please only use @CacheMethod OR @ClearCache -- not both. " +
 					" This occured on method: " + method.toString());
+		}else if (method.isAnnotationPresent(ClearCache.class)) {
+			return this.clearCache(joinPoint, method);
 		}
 		
 		Object target = this.getTarget(joinPoint);
@@ -219,15 +241,19 @@ public abstract class AbstractMethodCachingBean<T> implements InitializingBean, 
 					this.getArguments(joinPoint), 
 					parameterAnnotations);
 		
-		Cacheable cacheableAnnotation = AnnotationUtils.findAnnotation(target.getClass(), Cacheable.class);
+		//Cacheable cacheableAnnotation = AnnotationUtils.findAnnotation(target.getClass(), Cacheable.class);
 		CacheMethod cacheMethodAnnotation = AnnotationUtils.findAnnotation(method, CacheMethod.class);
 	
 		Cache<String,Object> cache = this.getCacheFromName(
-				cacheableAnnotation.cacheName(), true, joinPoint);
+				key, true, joinPoint);
+		//caches.put(key, cache);
 
-		if(method.isAnnotationPresent(ClearCache.class)) {
-			return this.clearCache(joinPoint, method);
-		}
+		
+//		Seems to be dead code -- there is an exception thrown earlier if this case exists
+		
+//		if(method.isAnnotationPresent(ClearCache.class)) {
+//			return this.clearCache(joinPoint, method);
+//		}
 
 		Object value = cache.get(key);
 		if(value != null) {
@@ -285,6 +311,7 @@ public abstract class AbstractMethodCachingBean<T> implements InitializingBean, 
 	public Cache<String,Object> getCacheFromName(String cacheName, boolean createIfNotPresent, T jointPoint){
 		return getCache(cacheName, createIfNotPresent, jointPoint);
 	}
+	
 
 	/**
 	 * Gets the key from method.

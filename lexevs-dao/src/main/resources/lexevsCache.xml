@@ -18,7 +18,7 @@
 	<bean id="methodCachingProxyAspect" 
 		class="org.lexevs.cache.MethodCachingProxy">
 		<property name="logger" ref="loggerFactory"/>
-		<property name="cacheRegistry" ref="cacheRegistry"/>
+		<!-- <property name="cacheRegistry" ref="cacheRegistry"/> -->
 	</bean>
 	
 	<bean id="cacheWrappingFactory" class="org.lexevs.cache.CacheWrappingFactory">
@@ -27,7 +27,7 @@
 	
 	<bean id="methodCachingInterceptor" class="org.lexevs.cache.MethodCachingInterceptor">
 		<property name="logger" ref="loggerFactory"/>
-		<property name="cacheRegistry" ref="cacheRegistry"/>
+		<!-- <property name="cacheRegistry" ref="cacheRegistry"/> -->
 	</bean>
 	
 	<bean id="cacheRegistry" class="org.lexevs.cache.CacheRegistry">

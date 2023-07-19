@@ -64,7 +64,7 @@ public class CacheRegistry implements InitializingBean, DisposableBean {
 		new ThreadLocal<Boolean>();
 	
 	public void afterPropertiesSet() throws Exception {
-		initializeCache();
+//		initializeCache();
 	}
 	
 	@Override
@@ -132,7 +132,6 @@ public class CacheRegistry implements InitializingBean, DisposableBean {
 	public void clearAll() {
 		List<String> caches = cacheManager.getRuntimeConfiguration().getCacheConfigurations().keySet().stream().collect(Collectors.toList());
 		caches.stream().forEach(x -> cacheManager.getCache(x, String.class, Object.class).clear());
-
 	}
 	
 //	public Map<String, Cache<String, Object>> getCaches() {

@@ -17,7 +17,7 @@ import org.lexevs.locator.LexEvsServiceLocator;
  * 
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
-@Cacheable(cacheName = "testCache")
+
 public class TestCacheBean {
 	
 	@Resource
@@ -84,7 +84,7 @@ public class TestCacheBean {
 		bean.getNestedValue("1", "2");
 	}
 	
-	@Cacheable(cacheName = "testCache")
+
 	public static class TestNestedCacheBean {
 		
 		@CacheMethod
