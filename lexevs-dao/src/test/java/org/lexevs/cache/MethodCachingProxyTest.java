@@ -55,73 +55,72 @@ public class MethodCachingProxyTest extends LexEvsDbUnitTestBase {
 		ref.setCodingSchemeVersion("version");
 		
 		System.out.println(testCacheBean.getValueOfCompositeObject(ref));
-		
-//		assertEquals(1, testCacheProxy.getCaches().get("testCache").size());
-		
-		AbsoluteCodingSchemeVersionReference ref2 = new AbsoluteCodingSchemeVersionReference();
-		ref2.setCodingSchemeURN("uri");
-		ref2.setCodingSchemeVersion("version");
-		
-		System.out.println(testCacheBean.getValueOfCompositeObject(ref2));
-		
-//		assertEquals(1, testCacheProxy.getCaches().get("testCache").size());	
+		assertEquals(testCacheBean.getValueOfCompositeObject(ref), ref.getCodingSchemeURN() + ref.getCodingSchemeVersion());
+		assertEquals(testCacheBean.getValueOfCompositeObject(ref), ref.getCodingSchemeURN() + ref.getCodingSchemeVersion());
+
+		AbsoluteCodingSchemeVersionReference ref1 = new AbsoluteCodingSchemeVersionReference();
+		ref1.setCodingSchemeURN("NEWuri");
+		ref1.setCodingSchemeVersion("NEWversion");
+		System.out.println(testCacheBean.getValueOfCompositeObject(ref1));
+		assertEquals(testCacheBean.getValueOfCompositeObject(ref1), ref1.getCodingSchemeURN() + ref1.getCodingSchemeVersion());
+		assertEquals(testCacheBean.getValueOfCompositeObject(ref1), ref1.getCodingSchemeURN() + ref1.getCodingSchemeVersion());
+
 	}
 	
 	/**
 	 * Test put in cache.
 	 */
-//	@Test
-//	public void testPutInCache(){
-//	
-//		assertEquals("onetwo", testCacheBean.getValue("one", "two"));
+	@Test
+	public void testPutInCache(){
+	
+		assertEquals("onetwo", testCacheBean.getValue("one", "two"));
 //		assertEquals(1, testCacheProxy.getCaches().get("testCache").size());
-//		assertEquals("onetwo", testCacheProxy.getCaches().get("testCache").values().toArray()[0]);
-//	}
-//	
-//	/**
-//	 * Test put twice in cache.
-//	 */
-//	@Test
-//	public void testPutTwiceInCache(){
-//		
-//		assertEquals("onetwo", testCacheBean.getValue("one", "two"));
-//		assertEquals("onetwo", testCacheBean.getValue("one", "two"));
+		assertEquals("onetwo", testCacheProxy.getCacheFromName("org.lexevs.dao.test.TestCacheBeangetValue110182115276").get("org.lexevs.dao.test.TestCacheBeangetValue110182115276"));
+	}
+	
+	/**
+	 * Test put twice in cache.
+	 */
+	@Test
+	public void testPutTwiceInCache(){
+		
+		assertEquals("onetwo", testCacheBean.getValue("one", "two"));
+		assertEquals("onetwo", testCacheBean.getValue("one", "two"));
 //		assertEquals(1, testCacheProxy.getCaches().get("testCache").size());
-//		assertEquals("onetwo", testCacheProxy.getCaches().get("testCache").values().toArray()[0]);
-//	}
-//	
-//	/**
-//	 * Test two different in cache.
-//	 */
-//	@Test
-//	public void testTwoDifferentInCache(){
-//		
-//		assertEquals("onetwo", testCacheBean.getValue("one", "two"));
-//		assertEquals("threefour", testCacheBean.getValue("three", "four"));
+		assertEquals("onetwo", testCacheProxy.getCacheFromName("org.lexevs.dao.test.TestCacheBeangetValue110182115276").get("org.lexevs.dao.test.TestCacheBeangetValue110182115276"));
+	}
+	
+	/**
+	 * Test two different in cache.
+	 */
+	@Test
+	public void testTwoDifferentInCache(){
+		
+		assertEquals("onetwo", testCacheBean.getValue("one", "two"));
+		assertEquals("threefour", testCacheBean.getValue("three", "four"));
+		assertEquals("threefour", testCacheProxy.getCacheFromName("org.lexevs.dao.test.TestCacheBeangetValue1103394863149094").get("org.lexevs.dao.test.TestCacheBeangetValue1103394863149094"));
+		assertEquals("onetwo", testCacheProxy.getCacheFromName("org.lexevs.dao.test.TestCacheBeangetValue110182115276").get("org.lexevs.dao.test.TestCacheBeangetValue110182115276"));	//		assertEquals("threefour", testCacheProxy.getCaches().get("testCache").values().toArray()[1]);
+	}
+	
+	
+	
+	/**
+	 * Test clear cache.
+	 */
+	@Test
+	public void testClearCache(){
+		
+		assertEquals("onetwo", testCacheBean.getValue("one", "two"));
+		assertEquals("threefour", testCacheBean.getValue("three", "four"));
 //		assertEquals(2, testCacheProxy.getCaches().get("testCache").size());
 //		assertEquals("onetwo", testCacheProxy.getCaches().get("testCache").values().toArray()[0]);
 //		assertEquals("threefour", testCacheProxy.getCaches().get("testCache").values().toArray()[1]);
-//	}
-//	
-//	
-//	
-//	/**
-//	 * Test clear cache.
-//	 */
-//	@Test
-//	public void testClearCache(){
-//		
-//		assertEquals("onetwo", testCacheBean.getValue("one", "two"));
-//		assertEquals("threefour", testCacheBean.getValue("three", "four"));
-//		assertEquals(2, testCacheProxy.getCaches().get("testCache").size());
-//		assertEquals("onetwo", testCacheProxy.getCaches().get("testCache").values().toArray()[0]);
-//		assertEquals("threefour", testCacheProxy.getCaches().get("testCache").values().toArray()[1]);
-//		
-//		testCacheBean.testClear();
+		
+		testCacheBean.testClear();
 //		assertEquals(0, testCacheProxy.getCaches().get("testCache").size());
-//		
-//	}
-//	
+		assertNull(testCacheBean.getValue("one", "two"));
+	}
+	
 //	/**
 //	 * Test clear cache.
 //	 */

@@ -17,8 +17,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 @Aspect
 public class MethodCachingProxy extends AbstractMethodCachingBean<ProceedingJoinPoint> {
 	
-	@Around("@within(org.lexevs.cache.annotation.Cacheable) && " +
-	"( @annotation(org.lexevs.cache.annotation.CacheMethod) || @annotation(org.lexevs.cache.annotation.ClearCache) )")
+	@Around("( @annotation(org.lexevs.cache.annotation.CacheMethod) || @annotation(org.lexevs.cache.annotation.ClearCache) )")
 	public Object cacheMethod(ProceedingJoinPoint pjp) throws Throwable {
 		return super.doCacheMethod(pjp);
 	}

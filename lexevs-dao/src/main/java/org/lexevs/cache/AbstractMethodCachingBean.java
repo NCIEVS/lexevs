@@ -18,6 +18,7 @@ import org.apache.commons.lang.ClassUtils;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.config.CacheConfiguration;
+import org.ehcache.config.Configuration;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.config.builders.ExpiryPolicyBuilder;
@@ -57,6 +58,8 @@ public abstract class AbstractMethodCachingBean<T> implements InitializingBean, 
 	private static String NULL_VALUE_KEY = "null";
 	
 	private static String NULL_VALUE_CACHE_PLACEHOLDER = "NULL_VALUE_CACHE_PLACEHOLDER";
+	
+	private static final String CLEAR_CACHE_PRESENT = "CLEAR_CASE_ANNOTATION_PRESENT";
 
 	//private CacheRegistry cacheRegistry;
 	
@@ -177,11 +180,15 @@ public abstract class AbstractMethodCachingBean<T> implements InitializingBean, 
 		} else {
 
 			for(String cacheName : clearCacheAnnotation.clearCaches()){
-				Cache<String,Object> cache = this.getCacheFromName(cacheName, false, joinPoint);
+				Cache<String,Object> cache = this.getCacheFromName(cacheName);
+						//, false, joinPoint);
+				if(cache != null) {
 				cache.clear();
+				}
 			}
 			
-			Cache<String,Object> cache = this.getCacheFromName(cacheableAnnotation.cacheName(), false,joinPoint);
+			Cache<String,Object> cache = this.getCacheFromName(cacheableAnnotation.cacheName());
+					//, false,joinPoint);
 	
 			cache.clear();
 		}
@@ -198,9 +205,7 @@ public abstract class AbstractMethodCachingBean<T> implements InitializingBean, 
 		caches
 		.stream()
 		.forEach(x -> 
-		cacheManager
-		.getCache(x, String.class, Object.class)
-		.clear());
+		cacheManager.removeCache(x));
 
 	}
 	
@@ -219,34 +224,31 @@ public abstract class AbstractMethodCachingBean<T> implements InitializingBean, 
 //		if(!CacheSessionManager.getCachingStatus()) {
 //			return this.proceed(joinPoint);
 //		}
+		
+		String key = this.getMethodKey(joinPoint);
+		if(key.equals(CLEAR_CACHE_PRESENT)) {
+			return this.clearCache(joinPoint, this.getMethod(joinPoint));
+		}
 
 		Method method = this.getMethod(joinPoint);
 
-		if(method.isAnnotationPresent(CacheMethod.class)
-				&&
-					method.isAnnotationPresent(ClearCache.class)){
-			throw new RuntimeException("Cannot both Cache method results and clear the Cache in " +
-					"the same method. Please only use @CacheMethod OR @ClearCache -- not both. " +
-					" This occured on method: " + method.toString());
-		}else if (method.isAnnotationPresent(ClearCache.class)) {
-			return this.clearCache(joinPoint, method);
-		}
-		
-		Object target = this.getTarget(joinPoint);
-		
-		Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-		
-		String key = this.getKeyFromMethod(target.getClass().getName(),
-					method.getName(),
-					this.getArguments(joinPoint), 
-					parameterAnnotations);
-		
+//		if(method.isAnnotationPresent(CacheMethod.class)
+//				&&
+//					method.isAnnotationPresent(ClearCache.class)){
+//			throw new RuntimeException("Cannot both Cache method results and clear the Cache in " +
+//					"the same method. Please only use @CacheMethod OR @ClearCache -- not both. " +
+//					" This occured on method: " + method.toString());
+//		}
+
 		//Cacheable cacheableAnnotation = AnnotationUtils.findAnnotation(target.getClass(), Cacheable.class);
 		CacheMethod cacheMethodAnnotation = AnnotationUtils.findAnnotation(method, CacheMethod.class);
 	
-		Cache<String,Object> cache = this.getCacheFromName(
-				key, true, joinPoint);
-		//caches.put(key, cache);
+		Cache<String,Object> cache = this.getCacheFromName(key);
+				//key, true, joinPoint);
+		if(cache == null) {
+			cache = this.getCache(key, true, joinPoint);
+		}
+//		caches.put(key, cache);
 
 		
 //		Seems to be dead code -- there is an exception thrown earlier if this case exists
@@ -269,23 +271,29 @@ public abstract class AbstractMethodCachingBean<T> implements InitializingBean, 
 
 		Object result = this.proceed(joinPoint);
 
-//		if(this.isolateCachesOnClear == false || 
-//				(this.isolateCachesOnClear == true &&
-//						(this.cacheRegistry.getInThreadCacheClearingState() == null 
-//								|| 
-//								this.cacheRegistry.getInThreadCacheClearingState() == false))){
-//			this.logger.debug("Thread is not in @Clear state, caching can continue for key: " + key);
-//
-//			if(result != null) {
-//				cache.put(key, result);
-//			} else {
-//				cache.put(key, NULL_VALUE_CACHE_PLACEHOLDER);
-//			}
-//		} else {
-//			this.logger.debug("Thread is in @Clear state, caching skipped for key: " + key);
-//		}
+		if(result != null) {
+			cache.put(key, result);
+		} else {
+			cache.put(key, NULL_VALUE_CACHE_PLACEHOLDER);
+		}
+		
+	//		caches.put(key, cache);
+			return returnResult(result, cacheMethodAnnotation);
+	}
+	
+	public String getMethodKey(T joinPoint) {
+		Method method = this.getMethod(joinPoint);
 
-		return returnResult(result, cacheMethodAnnotation);
+		if(method.isAnnotationPresent(ClearCache.class)){
+			return CLEAR_CACHE_PRESENT; }
+		Object target = this.getTarget(joinPoint);
+		
+		Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+		
+		return this.getKeyFromMethod(target.getClass().getName(),
+					method.getName(),
+					this.getArguments(joinPoint), 
+					parameterAnnotations);
 	}
 	
 	private Object returnResult(Object result, CacheMethod cacheMethodAnnotation) {
@@ -308,8 +316,17 @@ public abstract class AbstractMethodCachingBean<T> implements InitializingBean, 
 	
 	protected abstract Class<Object> getReturnType(T jointPoint);
 	
-	public Cache<String,Object> getCacheFromName(String cacheName, boolean createIfNotPresent, T jointPoint){
-		return getCache(cacheName, createIfNotPresent, jointPoint);
+	public Cache<String,Object> getCacheFromName(String cacheName){
+		Map<String, CacheConfiguration<?,?>> configs = cacheManager.getRuntimeConfiguration().getCacheConfigurations();
+		Class<Object> valueType = null;
+		if(configs != null && configs.size() > 0) {
+		CacheConfiguration config = configs.get(cacheName);
+		if(config != null) {
+		valueType = config.getValueType();
+		}
+		}
+		
+		return cacheManager.getCache(cacheName, String.class, valueType);
 	}
 	
 
@@ -425,7 +442,7 @@ public abstract class AbstractMethodCachingBean<T> implements InitializingBean, 
 	public CacheConfigurationBuilder getDefaultCacheConfiguration(T joinPoint) {
 			
 			return CacheConfigurationBuilder
-					.newCacheConfigurationBuilder(String.class, getReturnType(joinPoint).getClass(), 
+					.newCacheConfigurationBuilder(String.class, getReturnType(joinPoint), 
 							ResourcePoolsBuilder
 							.heap(100))
 					.withExpiry(
@@ -436,7 +453,8 @@ public abstract class AbstractMethodCachingBean<T> implements InitializingBean, 
 		}
 		
 	public Cache getCache(String cacheName, boolean createIfNotPresent, T joinPoint) {
-			Cache cache = cacheManager.getCache(cacheName, String.class, getReturnType(joinPoint).getClass());
+		
+		Cache cache = cacheManager.getCache(cacheName, String.class, getReturnType(joinPoint));
 			if(cache != null){
 				return cache;
 			}

@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
  * 
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
-
+@Cacheable(cacheName="DatabaseRegistryCache")
 public class DatabaseRegistry extends RegistryEventSupport implements Registry {
 	
 	/** The registry dao. */
@@ -211,7 +211,7 @@ public class DatabaseRegistry extends RegistryEventSupport implements Registry {
 	 * @see org.lexevs.registry.service.Registry#removeEntry(org.lexevs.registry.model.RegistryEntry)
 	 */
 	@Transactional
-	@ClearCache(clearCaches = {"DelegatingDatabaseToXmlRegistryCache","DelegatingSystemResourceServiceCache"})
+	//@ClearCache(clearCaches = {"DelegatingDatabaseToXmlRegistryCache","DelegatingSystemResourceServiceCache"})
 	public void removeEntry(RegistryEntry entry) throws LBParameterException {
 		registryDao.deleteRegistryEntry(entry);	
 	}
