@@ -75,6 +75,12 @@ public class TestCacheBean {
 	/**
 	 * Test clear.
 	 */
+	@ClearCache(clearAll=true)
+	public void testClearAll(){}
+	
+	/**
+	 * Test clear.
+	 */
 	@ClearCache
 	public void testClearWithNestedCache(){
 		if(this.cacheWrappingFactory == null){

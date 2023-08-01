@@ -112,15 +112,27 @@ public class MethodCachingProxyTest extends LexEvsDbUnitTestBase {
 		
 		assertEquals("onetwo", testCacheBean.getValue("one", "two"));
 		assertEquals("threefour", testCacheBean.getValue("three", "four"));
-//		assertEquals(2, testCacheProxy.getCaches().get("testCache").size());
-//		assertEquals("onetwo", testCacheProxy.getCaches().get("testCache").values().toArray()[0]);
-//		assertEquals("threefour", testCacheProxy.getCaches().get("testCache").values().toArray()[1]);
-		
-		testCacheBean.testClear();
-//		assertEquals(0, testCacheProxy.getCaches().get("testCache").size());
-		assertNull(testCacheBean.getValue("one", "two"));
+		assertEquals("onetwo",testCacheProxy.getCacheFromName("org.lexevs.dao.test.TestCacheBeangetValue110182115276").get("org.lexevs.dao.test.TestCacheBeangetValue110182115276"));
+		assertEquals("threefour", testCacheProxy.getCacheFromName("org.lexevs.dao.test.TestCacheBeangetValue1103394863149094").get("org.lexevs.dao.test.TestCacheBeangetValue1103394863149094"));		
+		testCacheBean.testClearAll();
+		assertNull(testCacheProxy.getCacheFromName("org.lexevs.dao.test.TestCacheBeangetValue110182115276").get("org.lexevs.dao.test.TestCacheBeangetValue110182115276"));
+		assertNull("threefour", testCacheProxy.getCacheFromName("org.lexevs.dao.test.TestCacheBeangetValue1103394863149094").get("org.lexevs.dao.test.TestCacheBeangetValue1103394863149094"));
 	}
 	
+	@Test
+	public void testClearAll(){
+		assertEquals("onetwo", testCacheBean.getValue("one", "two"));
+		assertEquals("threefour", testCacheBean.getValue("three", "four"));
+//		assertEquals(2, testCacheProxy.getCaches().get("testCache").size());
+		assertEquals("onetwo",testCacheProxy.getCacheFromName("org.lexevs.dao.test.TestCacheBeangetValue110182115276").get("org.lexevs.dao.test.TestCacheBeangetValue110182115276"));
+		assertEquals("threefour", testCacheProxy.getCacheFromName("org.lexevs.dao.test.TestCacheBeangetValue1103394863149094").get("org.lexevs.dao.test.TestCacheBeangetValue1103394863149094"));		
+//		testCacheBean.testClear();
+//		assertEquals(0, testCacheProxy.getCaches().get("testCache").size());
+		testCacheProxy.getCacheFromName("org.lexevs.dao.test.TestCacheBeangetValue110182115276").clear();
+		assertNull(testCacheProxy.getCacheFromName("org.lexevs.dao.test.TestCacheBeangetValue110182115276").get("org.lexevs.dao.test.TestCacheBeangetValue110182115276"));
+		testCacheProxy.clearCacheByName("org.lexevs.dao.test.TestCacheBeangetValue1103394863149094");
+		assertNull("threefour", testCacheProxy.getCacheFromName("org.lexevs.dao.test.TestCacheBeangetValue1103394863149094").get("org.lexevs.dao.test.TestCacheBeangetValue1103394863149094"));
+	}
 //	/**
 //	 * Test clear cache.
 //	 */

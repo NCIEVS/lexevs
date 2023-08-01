@@ -135,6 +135,9 @@ public abstract class AbstractMethodCachingBean<T> implements InitializingBean, 
 		return bytes / 1024 / 1024;
 	}
 
+	public void clearCacheByName(String name) {
+		this.getCacheFromName(name).clear();
+	}
 	
 
 	/**
@@ -156,13 +159,13 @@ public abstract class AbstractMethodCachingBean<T> implements InitializingBean, 
 
 			Object target = this.getTarget(joinPoint);
 
-			Cacheable cacheableAnnotation = AnnotationUtils.findAnnotation(target.getClass(), Cacheable.class);
+	//		Cacheable cacheableAnnotation = AnnotationUtils.findAnnotation(target.getClass(), Cacheable.class);
 
 			ClearCache clearCacheAnnotation = method.getAnnotation(ClearCache.class);
 
 			Object returnObj = this.proceed(joinPoint);
 			
-			clearCache(cacheableAnnotation, clearCacheAnnotation, joinPoint);
+			clearCache(clearCacheAnnotation, joinPoint);
 
 			return returnObj;
 		} finally {
@@ -173,24 +176,23 @@ public abstract class AbstractMethodCachingBean<T> implements InitializingBean, 
 	}
 
 	private void clearCache(
-			Cacheable cacheableAnnotation,
 			ClearCache clearCacheAnnotation, T joinPoint) {
 		if(clearCacheAnnotation.clearAll()) {
 			clearAll();
 		} else {
 
-			for(String cacheName : clearCacheAnnotation.clearCaches()){
-				Cache<String,Object> cache = this.getCacheFromName(cacheName);
+			//for(String cacheName : clearCacheAnnotation.clearCaches()){
+				Cache<String,Object> cache = this.getCacheFromName(getMethodKey(joinPoint));
 						//, false, joinPoint);
 				if(cache != null) {
 				cache.clear();
-				}
+			//	}
 			}
 			
-			Cache<String,Object> cache = this.getCacheFromName(cacheableAnnotation.cacheName());
-					//, false,joinPoint);
-	
-			cache.clear();
+//			Cache<String,Object> cache = this.getCacheFromName(cacheableAnnotation.cacheName());
+//					//, false,joinPoint);
+//	
+//			cache.clear();
 		}
 	}
 	
@@ -205,7 +207,7 @@ public abstract class AbstractMethodCachingBean<T> implements InitializingBean, 
 		caches
 		.stream()
 		.forEach(x -> 
-		cacheManager.removeCache(x));
+		this.clearCacheByName(x));
 
 	}
 	
