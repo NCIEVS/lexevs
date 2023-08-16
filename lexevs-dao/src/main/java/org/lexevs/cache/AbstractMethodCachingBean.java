@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.Boolean;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,9 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-
 import org.LexGrid.LexBIG.Utility.logging.LgLoggerIF;
-import org.apache.commons.lang.ClassUtils;
+import org.apache.commons.lang3.ClassUtils;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.config.CacheConfiguration;
@@ -26,7 +26,7 @@ import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.core.internal.statistics.DefaultStatisticsService;
 import org.ehcache.core.spi.service.StatisticsService;
 import org.ehcache.core.statistics.CacheStatistics;
-//import org.lexevs.cache.CacheRegistry.CacheWrapper;
+import com.google.common.primitives.Primitives;
 import org.lexevs.cache.annotation.CacheMethod;
 import org.lexevs.cache.annotation.Cacheable;
 import org.lexevs.cache.annotation.ClearCache;
@@ -275,12 +275,49 @@ public abstract class AbstractMethodCachingBean<T> implements InitializingBean, 
 
 		if(result != null) {
 			cache.put(key, result);
-		} else {
-			cache.put(key, NULL_VALUE_CACHE_PLACEHOLDER);
-		}
+		} 
+//		else {
+//			cache.put(key, null);
+//		}
 		
 	//		caches.put(key, cache);
 			return returnResult(result, cacheMethodAnnotation);
+	}
+	
+	public Object getPrimitiveWrapperValue(Object wrapper) {
+		if(Primitives.isWrapperType(wrapper.getClass())) {
+
+		String name = wrapper.getClass().getSimpleName();
+		
+		 switch (name) {
+         case "Boolean":
+         		  return ((Boolean)wrapper).booleanValue();
+                 
+         case "Byte": 
+         		  return ((Byte)wrapper).byteValue();
+                 
+         case "Character":
+         		  return ((Character)wrapper).charValue();
+                 
+         case "Double":
+         		  return ((Double)wrapper).doubleValue();
+                 
+         case "Float":
+         		  return ((Float)wrapper).floatValue();
+                 
+         case "Integer":
+           		  return ((Integer)wrapper).intValue();
+                 
+         case "Long":
+         		  return ((Long)wrapper).longValue();
+                 
+         case "Short":
+         		  return ((Short)wrapper).shortValue();
+         default: throw new RuntimeException("Attempting to return primitive from "
+         		+ "wrapper on unqualified class.  This should never happen"); 
+     }
+		}
+		return null;
 	}
 	
 	public String getMethodKey(T joinPoint) {
@@ -442,6 +479,7 @@ public abstract class AbstractMethodCachingBean<T> implements InitializingBean, 
 
 		
 	public CacheConfigurationBuilder getDefaultCacheConfiguration(T joinPoint) {
+		
 			
 			return CacheConfigurationBuilder
 					.newCacheConfigurationBuilder(String.class, getReturnType(joinPoint), 

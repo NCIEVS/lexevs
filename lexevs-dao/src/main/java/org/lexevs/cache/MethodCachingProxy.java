@@ -9,6 +9,8 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 
+import com.google.common.primitives.Primitives;
+
 /**
  * The Class MethodCachingProxy.
  * 
@@ -47,6 +49,6 @@ public class MethodCachingProxy extends AbstractMethodCachingBean<ProceedingJoin
 	@Override
 	protected Class<Object> getReturnType(ProceedingJoinPoint jointPoint) {
 		Signature sig = jointPoint.getSignature();
-		return ((MethodSignature)sig).getReturnType();
+		return Primitives.wrap(((MethodSignature)sig).getReturnType());
 	}
 }

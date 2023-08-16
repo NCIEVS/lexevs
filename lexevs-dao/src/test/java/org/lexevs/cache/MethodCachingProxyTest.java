@@ -103,6 +103,10 @@ public class MethodCachingProxyTest extends LexEvsDbUnitTestBase {
 	}
 	
 	
+	@Test
+	public void testBooleanPrimativeInCache() {
+		assertEquals(true, testCacheBean.getPrimativeBooleanValue(true));
+	}
 	
 	/**
 	 * Test clear cache.

@@ -54,6 +54,12 @@ public class TestCacheBean {
 		return cs;
 	}
 	
+	@CacheMethod
+	public boolean getPrimativeBooleanValue(
+			boolean arg){
+		return arg;
+	}
+	
 	/**
 	 * Gets the value not cachable.
 	 * 
@@ -89,6 +95,7 @@ public class TestCacheBean {
 		TestNestedCacheBean bean = cacheWrappingFactory.wrapForCaching(new TestNestedCacheBean());
 		bean.getNestedValue("1", "2");
 	}
+
 	
 
 	public static class TestNestedCacheBean {
