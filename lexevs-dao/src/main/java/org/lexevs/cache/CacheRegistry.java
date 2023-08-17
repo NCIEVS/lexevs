@@ -1,70 +1,37 @@
 
 package org.lexevs.cache;
 
-import java.io.InputStream;
-import java.io.Serializable;
-import java.net.URL;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.config.CacheConfiguration;
-import org.ehcache.config.ResourcePools;
-import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
-import org.ehcache.config.builders.ExpiryPolicyBuilder;
-import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.core.internal.statistics.DefaultStatisticsService;
 import org.ehcache.core.spi.service.StatisticsService;
 import org.ehcache.core.statistics.CacheStatistics;
-import org.ehcache.expiry.ExpiryPolicy;
-import org.ehcache.xml.XmlConfiguration;
-
-
 import org.lexevs.logging.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.w3c.dom.NodeList;
+
+
+//Most functions moved to the AbstractMethodCachingBean;
 
 public class CacheRegistry implements InitializingBean, DisposableBean {
-	
 	private static CacheManager cacheManager;
-	
-//	@Autowired
-//	private CacheConfigLocationFactory cacheConfig;
-//	
-//	public CacheConfigLocationFactory getCacheConfig() {
-//		return cacheConfig;
-//	}
-//
-//	public void setCacheConfig(CacheConfigLocationFactory cacheConfig) {
-//		this.cacheConfig = cacheConfig;
-//	}
+
 
 	private StatisticsService statisticsService;
-//	private XmlConfiguration xmlConfig;
 	Map<String, CacheConfiguration<?, ?>> cacheConfigs;
 
-/** The caches. */
-// private Map<String,Cache<String,Object>> caches = new HashMap<String,Cache<String,Object>>();
 
 
 	private final ThreadLocal<Boolean> inCacheClearingState =
 		new ThreadLocal<Boolean>();
 	
 	public void afterPropertiesSet() throws Exception {
-//		initializeCache();
+		//NOOP
 	}
 	
 	@Override
@@ -86,8 +53,7 @@ public class CacheRegistry implements InitializingBean, DisposableBean {
         String[] keys = (String[]) cacheConfigs.keySet().toArray();
 		for(int i=0; i < keys.length; i++) {
 		 String cacheName = keys[i];
-			//Cache cache = cacheManager.getCache(cacheName, String.class, Object.class);
-			
+
 			CacheStatistics ehCacheStat = statisticsService.getCacheStatistics(cacheName);
 			hits += ehCacheStat.getCacheHits();
 			misses += ehCacheStat.getCacheMisses();
@@ -132,43 +98,6 @@ public class CacheRegistry implements InitializingBean, DisposableBean {
 	public void clearAll() {
 		List<String> caches = cacheManager.getRuntimeConfiguration().getCacheConfigurations().keySet().stream().collect(Collectors.toList());
 		caches.stream().forEach(x -> cacheManager.getCache(x, String.class, Object.class).clear());
-	}
-	
-//	public Map<String, Cache<String, Object>> getCaches() {
-//		return Collections.unmodifiableMap(this.caches);
-//	}
-
-//	public Cache<String, Object> getCache(String cacheName, boolean createIfNotPresent, Class clazz) {
-//			EhcacheFactory<clazz> factory = new org.lexevs.cache.CacheRegistry.EhcacheFactory<clazz>();
-//			return (Cache<String, Object>) factory.getCache(cacheName, String.class, clazz);
-//
-//	}
-	
-	class EhcacheFactory<T>{
-		
-		protected CacheConfigurationBuilder<String, T> getDefaultCacheConfiguration(T type) {
-			Class<T> clazz = (Class<T>) type.getClass();
-			return CacheConfigurationBuilder
-					.newCacheConfigurationBuilder(String.class, clazz, 
-							ResourcePoolsBuilder
-							.heap(100))
-					.withExpiry(
-							ExpiryPolicyBuilder
-							.timeToLiveExpiration(
-									Duration
-									.ofSeconds(600)));
-		}
-		
-		protected Cache<String, T> getCache(String cacheName, boolean createIfNotPresent, T type) {
-			Cache<String, T> cache = (Cache<String, T>) cacheManager.getCache(cacheName, String.class, type.getClass());
-			if(cache != null){
-				return cache;
-			}
-			else {
-				return cacheManager.createCache(cacheName, getDefaultCacheConfiguration(type));
-			}
-		}
-		
 	}
 
 

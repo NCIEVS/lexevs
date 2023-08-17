@@ -5,8 +5,6 @@ import java.lang.reflect.Method;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.aspectj.lang.Signature;
-import org.aspectj.lang.reflect.MethodSignature;
 
 public class MethodCachingInterceptor extends AbstractMethodCachingBean<MethodInvocation> implements MethodInterceptor{
 
@@ -35,6 +33,7 @@ public class MethodCachingInterceptor extends AbstractMethodCachingBean<MethodIn
 		return this.doCacheMethod(methodInvocation);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected Class<Object> getReturnType(MethodInvocation jointPoint) {
 		return (Class<Object>) jointPoint.getMethod().getReturnType();

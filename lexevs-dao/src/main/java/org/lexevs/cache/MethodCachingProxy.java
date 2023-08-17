@@ -46,6 +46,7 @@ public class MethodCachingProxy extends AbstractMethodCachingBean<ProceedingJoin
 		return joinPoint.proceed();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected Class<Object> getReturnType(ProceedingJoinPoint jointPoint) {
 		Signature sig = jointPoint.getSignature();
