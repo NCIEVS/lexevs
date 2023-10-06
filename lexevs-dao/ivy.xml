@@ -85,7 +85,7 @@
 		<dependency org="org.javassist" name="javassist" rev="3.29.2-GA" conf="default" />
 		<dependency org="com.thoughtworks.xstream" name="xstream" rev="1.4.20" conf="default" />
 		<dependency org="org.codehaus.jettison" name="jettison" rev="1.5.3" conf="default" />
-		<dependency org="stax" name="stax-api" rev="1.0.1" conf="default" />
+<!--		<dependency org="stax" name="stax-api" rev="1.0.1" conf="default" /> -->
 		<dependency org="org.hsqldb" name="hsqldb" rev="2.0.0" conf="default" />
 		<dependency org="junit" name="junit" rev="4.13.2" force="true" conf="default" /> 
 		<!--<dependency org="org.apache.ibatis" name="ibatis-sqlmap" rev="2.3.4.726" conf="default"/>-->
@@ -111,7 +111,9 @@
 		<dependency org="com.arangodb" name="velocypack" rev="3.0.0" conf="default"/>
 		<dependency org="com.fasterxml" name="classmate" rev="1.5.1" conf="default"/>
 		<dependency org="commons-cli" name="commons-cli" rev="1.5.0" conf="default"/>
-		<dependency org="xml-apis" name="xml-apis" rev="1.4.01" conf="default"/>
+<!--		<dependency org="xml-apis" name="xml-apis" rev="1.4.01" conf="default"/>  -->
+		<!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
+		<dependency org="javax.xml.bind" name="jaxb-api" rev="2.3.1" conf="default"/>
 		
    	 </dependencies>
 </ivy-module>

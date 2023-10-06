@@ -62,7 +62,7 @@ public class ClaML2LG {
 			config_ = config;
 					
 			ClaMLXMLReader reader = new ClaMLXMLReader();
-			clamlXML_ = reader.readClaMLXML(clamlXML_URI, config);
+			//clamlXML_ = reader.readClaMLXML(clamlXML_URI, config);
 			
 			CodingScheme clamlCS = new CodingScheme();
 			clamlCS.setEntities(new Entities());
