@@ -64,15 +64,17 @@
 		<dependency org="org.mybatis" name="mybatis" rev="3.5.11" conf="default" />
 		<dependency org="org.mybatis.dynamic-sql" name="mybatis-dynamic-sql" rev="1.4.1" conf="default" />
 		<dependency org="org.mybatis" name="mybatis-typehandlers-jsr310" rev="1.0.2" conf="default" />
-		<dependency org="org.hibernate" name="hibernate-core" rev="5.6.8.Final" conf="default" />
-		<dependency org="org.hibernate" name="hibernate-core" rev="3.6.10.Final" conf="default" />
+		<dependency org="org.hibernate.orm" name="hibernate-core" rev="6.3.1.Final" conf="default" />
 		<dependency org="net.bytebuddy" name="byte-buddy-dep" rev="1.12.20" conf="default" />
-		<dependency org="org.hibernate.common" name="hibernate-commons-annotations" rev="5.1.2.Final" conf="default" />
+		<dependency org="org.hibernate.common" name="hibernate-commons-annotations" rev="6.0.6.Final" conf="default" />
+		<!-- https://mvnrepository.com/artifact/org.hibernate.javax.persistence/hibernate-jpa-2.1-api -->
+		<dependency org="org.hibernate.javax.persistence" name="hibernate-jpa-2.1-api" rev="1.0.2.Final" conf="default" />
 		<dependency org="org.hibernate" name="hibernate-ehcache" rev="5.6.8.Final" conf="default" />
 		<dependency org="org.jboss.logging" name="jboss-logging" rev="3.4.3.Final" conf="default" />
-<!--		<dependency org="org.hibernate.javax.persistence" name="hibernate-jpa-2.1-api" rev="1.0.2.Final" conf="default" />-->
-<!--		<dependency org="javax.persistence" name="persistence-api" rev="1.0.2" conf="default" />-->
-<!--		<dependency org="org.hibernate" name="hibernate-ehcache" rev="5.6.15.Final" conf="default" /> -->
+		<dependency org="jakarta.activation" name="jakarta.activation-api" rev="2.1.2" conf="default" />		
+		<dependency org="jakarta.persistence" name="jakarta.persistence-api" rev="3.1.0" conf="default" />
+		<dependency org="jakarta.transaction" name="jakarta.transaction-api" rev="2.0.1" conf="default" />
+		<!--<dependency org="org.hibernate" name="hibernate-ehcache" rev="5.6.15.Final" conf="default" /> -->
 		<dependency org="javax.annotation" name="javax.annotation-api" rev="1.3.2" conf="default" />
 		<dependency org="org.apache.logging.log4j" name="log4j-api" rev="2.19.0" conf="default" />
   		<dependency org="org.apache.logging.log4j" name="log4j-core" rev="2.19.0" conf="default" />
@@ -90,7 +92,12 @@
 		<dependency org="junit" name="junit" rev="4.13.2" force="true" conf="default" /> 
 		<!--<dependency org="org.apache.ibatis" name="ibatis-sqlmap" rev="2.3.4.726" conf="default"/>-->
 		<dependency org="org.apache.ant" name="ant" rev="1.10.13" conf="default"/>
-   		<dependency org="antlr" name="antlr" rev="2.7.7" conf="default"/>
+   		<!--<dependency org="antlr" name="antlr" rev="2.7.7" conf="default"/> -->
+   		<!-- https://mvnrepository.com/artifact/org.antlr/antlr4 -->
+		<dependency org="org.antlr" name="antlr4" rev="4.13.1" conf="default"/>
+   		<!-- https://mvnrepository.com/artifact/org.antlr/antlr4-runtime -->
+		<dependency org="org.antlr" name="antlr4-runtime" rev="4.13.1" conf="default"/>
+   		
    		<dependency org="org.dbunit" name="dbunit" rev="2.7.3" conf="default"/>
    		<dependency org="commons-io" name="commons-io" rev="2.11.0" conf="default" />
 		<dependency org="commons-dbcp" name="commons-dbcp" rev="1.4" conf="default" />
@@ -112,8 +119,7 @@
 		<dependency org="com.fasterxml" name="classmate" rev="1.5.1" conf="default"/>
 		<dependency org="commons-cli" name="commons-cli" rev="1.5.0" conf="default"/>
 <!--		<dependency org="xml-apis" name="xml-apis" rev="1.4.01" conf="default"/>  -->
-		<!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
-		<dependency org="javax.xml.bind" name="jaxb-api" rev="2.3.1" conf="default"/>
-		
+		<dependency org="jakarta.xml.bind" name="jakarta.xml.bind-api" rev="3.0.1" conf="default"/>         
+
    	 </dependencies>
 </ivy-module>

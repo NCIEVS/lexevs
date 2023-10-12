@@ -13,9 +13,9 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
-import org.hibernate.annotations.TypeDefs;
-import org.hibernate.type.NumericBooleanType;
+//import org.hibernate.annotations.TypeDef;
+//import org.hibernate.annotations.TypeDefs;
+//import org.hibernate.type.NumericBooleanType;
 import org.lexevs.dao.database.constants.DatabaseConstants;
 import org.lexevs.registry.service.Registry.ResourceType;
 import org.lexevs.registry.service.XmlRegistry.DBEntry;
@@ -26,15 +26,15 @@ import org.lexevs.registry.service.XmlRegistry.HistoryEntry;
  * 
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
-@TypeDefs (
-		{
-			@TypeDef(
-					name="numericBoolean", typeClass=NumericBooleanType.class
-			)
-		}
-) 
+//@TypeDefs (
+//		{
+//			@TypeDef(
+//					name="numericBoolean", typeClass=NumericBooleanType.class
+//			)
+//		}
+//) 
 
-@Entity
+@Entity(name = "RegistryEntry")
 @Table(name=DatabaseConstants.PREFIX_PLACEHOLDER + "registry")
 public class RegistryEntry {
 	
@@ -70,7 +70,7 @@ public class RegistryEntry {
 	private String fixedAtRevision;
 	
 	/** The is locked. */
-	@Type(type = "numericBoolean")
+//	@Type(type = "numericBoolean")
 	private Boolean isLocked;
 	
 	/** The last update date. */
@@ -84,12 +84,14 @@ public class RegistryEntry {
 	
 	/** The resource type. */
 	@Enumerated(EnumType.STRING)
+	@Column(name = "resourceType")
 	private ResourceType resourceType;
 	
 	/** The resource version. */
 	private String resourceVersion;
 	
 	/** The resource uri. */
+	@Column(name = "resourceURI")
 	private String resourceUri;
 
 	/** The status. */
