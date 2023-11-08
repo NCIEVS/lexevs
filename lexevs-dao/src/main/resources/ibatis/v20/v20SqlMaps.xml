@@ -84,6 +84,8 @@
 		<!--<typeAlias alias="variablePrimaryKeyTypeHandler" type="org.lexevs.dao.database.ibatis.sqlmap.VariablePrimaryKeyTypeHandler"/>-->
 		<typeAlias alias="vsEntity" type="org.lexevs.dao.database.ibatis.entity.model.IdableEntity"/>
 		<typeAlias alias="vsProperty" type="org.LexGrid.commonTypes.Property"/>
+		<typeAlias alias="registyr" type="org.lexevs.registry.model.Registry"/>
+		<typeAlias alias="registryEntry" type="org.lexevs.registry.model.RegistryEntry"/>
 	</typeAliases>
 	
 	<typeHandlers>

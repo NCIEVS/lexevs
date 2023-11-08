@@ -56,6 +56,8 @@ public class IbatisRegistryDao extends AbstractIbatisDao implements RegistryDao 
 	private static final String GET_ALL_REGISTRY_ENTRIES = null;
 
 	private static final String INIT_REGISTRY_METADATA = null;
+
+	private static final String UPDATE_LAST_UPDATE_TIME = null;
 	
 	/** The default history prefix. */
 	private String defaultHistoryPrefix = "aaaa";
@@ -73,7 +75,7 @@ public class IbatisRegistryDao extends AbstractIbatisDao implements RegistryDao 
 	public void updateLastUpdateTime(Date lastUpdateTime) {
 		Registry registry = getRegistryMetadataEntry();
 		registry.setLastUpdateTime(new Timestamp(lastUpdateTime.getTime()));
-		this.getSqlSessionTemplate().update(null, registry);
+		this.getSqlSessionTemplate().update(UPDATE_LAST_UPDATE_TIME, registry);
 	}
 	
 	/* (non-Javadoc)

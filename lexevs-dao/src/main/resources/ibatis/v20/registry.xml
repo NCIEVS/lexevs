@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Converted at: Mon Apr 18 08:46:17 EDT 2022-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Registry">
+
+	
+	<resultMap id="registryResult" type="registry">
+		<result property="id" column="id"/>
+		<result property="lastUpdateTime" column="lastUpdateTime"/>
+		<result property="lastUsedDbIdentifer" column="lastUsedDBIdentifer"/>
+		<result property="astUsedHistoryIdentifer" column="lastUsedHistoryIdentifer"/>
+	</resultMap>
+	
+	<resultMap id="registryEntry" type="registryEntry">
+		<result property="id" column="registryGuid"/>
+		<result property="activationDate" column="activationDate" />
+		<result property="baseRevision" column="baseRevision"/>
+		<result property="dbName" column="dbName"/>
+		<result property="dbSchemaDescription" column="dbSchemaDescription"/>
+		<result property="dbSchemaVersion" column="dbSchemaVersion"/>
+		<result property="dbUri" column="dbURI"/>
+		<result property="deactivationDate" column="deactivationDate"/>
+		<result property="fixedAtRevision" column="fixedAtRevision" />
+		<result property="isLocked" column="isLocked"/>
+		<result property="lastUpdateDate" column="lastUpdateDate"/>
+		<result property="prefix" column="prefix"/>
+		<result property="stagingPrefix" column="stagingPrefix"/>
+		<result property="resourceType" column="resourceType"/>
+		<result property="resourceVersion" column="resourceVersion"/>
+		<result property="resourceUri" column="resourceURI"/>
+		<result property="status" column="status"/>
+		<result property="tag" column="tag"/>
+		<result property="supplementsUri" column="supplementsUri"/>
+		<result property="supplementsVersion" column="supplementsVersion"/>
+	</resultMap>
+	
+	<select id="updateLastUpdateTime" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameter" resultMap="relationAttributes">
+		UPDATE INTO
+			${defaultPrefix}registryMetaData
+		WHERE 
+			id = #{param2}		
+     </select>
+     
+     <insert id="insertRegistry" parameterType="org.lexevs.dao.database.ibatis.association.parameter.InsertOrUpdateRelationsBean">
+		INSERT INTO ${prefix}relation (
+			relationGuid,
+			codingSchemeGuid,
+			containerName,
+			isMapping,
+			sourceCodingScheme,
+			sourceCodingSchemeVersion,
+			targetCodingScheme,
+			targetCodingSchemeVersion,
+			description,
+			isActive,
+			owner,
+			status,
+			effectiveDate,
+			expirationDate,
+			entryStateGuid
+		) VALUES (
+			#{relationGuid}, 
+			#{codingSchemeGuid},
+			#{containerName}, 
+			#{isMapping},
+			#{sourceCodingScheme,jdbcType=VARCHAR}, 
+			#{sourceCodingSchemeVersion,jdbcType=VARCHAR}, 
+			#{targetCodingScheme,jdbcType=VARCHAR}, 
+			#{targetCodingSchemeVersion,jdbcType=VARCHAR}, 
+			#{description,jdbcType=VARCHAR},			
+			#{isActive},
+			#{owner,jdbcType=VARCHAR},
+			#{status,jdbcType=VARCHAR},
+			#{effectiveDate,jdbcType=TIMESTAMP},
+			#{expirationDate,jdbcType=TIMESTAMP},
+			#{entryStateUId}
+		)
+  </insert>
+  
+   <insert id="insertAssociationPredicate" parameterType="org.lexevs.dao.database.ibatis.association.parameter.InsertAssociationPredicateBean">
+   		INSERT INTO ${prefix}associationPredicate (
+   			associationPredicateGuid,
+   			relationGuid,
+   			associationName
+   		) VALUES (
+   			#{uid},
+   			#{relationUId},
+   			#{associationPredicate.associationName,jdbcType=VARCHAR}
+   		)
+   </insert>
+
+   <select id="getAssociationPredicateUidsForName" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameterTriple" resultMap="Common.uidResult">
+   		SELECT
+   			associationPredicateGuid AS uidKey
+   		FROM
+   			${prefix}associationPredicate associationPredicate
+   		INNER JOIN
+			${prefix}relation relation
+		ON 
+			(relation.relationGuid = associationPredicate.relationGuid)
+		WHERE
+			relation.codingSchemeGuid = #{param1}
+		<if test="param2 != null">
+		AND
+			relation.containerName = #{param2}
+		</if>
+		AND
+			associationPredicate.associationName = #{param3}
+   </select>
+   
+   	<select id="getAssociationPredicatNamesFromCodingSchemeUid" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameterTuple" resultType="String">
+		SELECT DISTINCT
+			associationPredicate.associationName
+		FROM
+			${prefix}associationPredicate associationPredicate
+		INNER JOIN
+			${prefix}relation relation
+		ON 
+			(relation.relationGuid = associationPredicate.relationGuid)
+		WHERE
+			relation.codingSchemeGuid = #{param1}
+		<if test="param2 != null">
+		AND
+			relation.containerName = #{param2}
+		</if>
+	</select>
+   
+  	<select id="getAssociationPredicateKeysForRelationsId" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameter" resultMap="Common.uidResult">
+   		SELECT
+   			associationPredicateGuid AS uidKey
+   		FROM
+   			${prefix}associationPredicate
+		WHERE
+			relationGuid = 
+			#{param1}
+   </select>
+   
+   <select id="getRelationsKey" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameterTuple" resultMap="Common.uidResult">
+   		SELECT
+   			relationGuid AS uidKey
+   		FROM
+   			${prefix}relation
+		WHERE
+			codingSchemeGuid = 
+			#{param1}
+		AND
+			containerName = 
+			#{param2}		
+   </select>
+   
+    <select id="getRelationsKeysForCodingSchemeId" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameter" resultMap="Common.uidResult">
+   		SELECT
+   			relationGuid AS uidKey
+   		FROM
+   			${prefix}relation
+		WHERE
+			codingSchemeGuid = 
+			#{param1}	
+   </select>
+   
+   <select id="getRelationsNamesForCodingSchemeId" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameter" resultType="string">
+   		SELECT
+   			containerName
+   		FROM
+   			${prefix}relation
+		WHERE
+			codingSchemeGuid = 
+			#{param1}	
+   </select>
+   
+   <select id="getAssociationPredicateNameForId" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameter" resultType="string">
+   		SELECT
+   			associationName
+   		FROM
+   			${prefix}associationPredicate
+   		WHERE
+			associationPredicateGuid = 
+			#{param1}
+   </select> 
+   
+   <select id="getAssociationPredicateForId" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameter" resultMap="associationPredicateResult">
+   		SELECT
+   			associationName
+   		FROM
+   			${prefix}associationPredicate
+   		WHERE
+			associationPredicateGuid = 
+			#{param1}
+   </select> 
+   
+   <sql id="getRelationsFragment">
+    	SELECT
+   			relation.containerName,
+   			relation.isMapping,
+   			relation.representsVersion,
+   			relation.sourceCodingScheme,
+   			relation.sourceCodingSchemeVersion,
+   			relation.targetCodingScheme,
+   			relation.targetCodingSchemeVersion,
+   			relation.description,
+   			relation.isActive,
+   			relation.owner,
+   			relation.status,
+   			relation.effectiveDate,
+   			relation.expirationDate,
+   			
+   			entryState.changeType,
+  			entryState.relativeOrder,
+  			entryState.relativeOrder,
+  			
+  			currentRevision.revisionId AS currentRevisionId,
+  			previousRevision.revisionId AS previousRevisionId
+  		
+  		FROM
+  			${prefix}relation relation
+  			
+  		LEFT JOIN
+			${actualTableSetPrefix}entryState entryState
+		ON
+			relation.entryStateGuid =
+			entryState.entryStateGuid	
+			
+		LEFT JOIN
+			${defaultPrefix}revision currentRevision
+		ON 
+			entryState.revisionGuid = currentRevision.revisionGuid
+			
+		LEFT JOIN
+			${defaultPrefix}revision previousRevision
+		ON 
+			entryState.prevRevisionGuid = previousRevision.revisionGuid
+   </sql>
+   
+   <select id="getRelationsForUid" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameterTuple" resultMap="relationsResult">
+   		<include refid="getRelationsFragment"/>
+   		WHERE
+			relation.codingSchemeGuid = #{param1}
+		AND
+			relation.relationGuid = #{param2}
+   </select>
+ 
+   <select id="getRelationsForUidAndRevisionId" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameterTriple" resultMap="relationsResult">
+   		<include refid="getRelationsFragment"/>
+   		WHERE
+			relation.codingSchemeGuid = #{param1}
+		AND
+			relation.relationGuid = #{param2}
+		AND
+			currentRevision.revisionId = #{param3}
+   </select>
+   
+   <select id="getAssociationPredicateUIdByContainerName" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameterTriple" resultMap="Common.uidResult">
+   		SELECT
+   			assoc.associationPredicateGuid AS uidKey
+   		FROM
+   			${prefix}associationPredicate assoc
+   		INNER JOIN
+   			${prefix}relation rel
+   		ON
+   			rel.relationGuid = assoc.relationGuid
+		WHERE
+			rel.codingSchemeGuid = #{param1}
+		AND
+			rel.containerName = #{param2}
+		AND
+			assoc.associationName = #{param3}
+   </select> 
+     
+	<select id="getAssociationPredicateUIdByContainerUId" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameterTuple" resultMap="Common.uidResult">
+   		SELECT
+   			assoc.associationPredicateGuid AS uidKey
+   		FROM
+   			${prefix}associationPredicate assoc   			
+		WHERE
+			assoc.relationGuid = #{param1}
+		AND
+			assoc.associationName = #{param2}
+   </select> 
+     
+   <update id="updateRelationByUId" parameterType="org.lexevs.dao.database.ibatis.association.parameter.InsertOrUpdateRelationsBean">
+		UPDATE 
+			${prefix}relation relation
+		<set>
+			<if test="relations.isMapping !=null">
+				isMapping = #{relations.isMapping},
+			</if>
+		    <if test="relations.representsVersion !=null">
+				representsVersion = #{relations.representsVersion},
+			</if>
+			<if test="relations.sourceCodingScheme !=null">
+				sourceCodingScheme = #{relations.sourceCodingScheme},
+			</if>
+			<if test="relations.sourceCodingSchemeVersion !=null">
+				sourceCodingSchemeVersion = #{relations.sourceCodingSchemeVersion},
+			</if>
+			<if test="relations.targetCodingScheme !=null">
+				targetCodingScheme = #{relations.targetCodingScheme},
+			</if>
+			<if test="relations.targetCodingSchemeVersion !=null">
+				targetCodingSchemeVersion = #{relations.targetCodingSchemeVersion},
+			</if>
+			<if test="relations.entityDescription.content !=null">
+				description = #{relations.entityDescription.content},
+			</if>
+			<if test="relations.entryStateUId !=null">
+				entryStateGuid = #{entryStateUId}
+			</if>
+		</set>
+
+		WHERE 
+			relation.relationGuid = #{uid}
+		AND
+			relation.codingSchemeGuid = #{codingSchemeUId}
+ 	</update>
+ 	
+   <update id="updateRelationVersionableChangesByUId" parameterType="org.lexevs.dao.database.ibatis.association.parameter.InsertOrUpdateRelationsBean">
+		UPDATE 
+			${prefix}relation rel
+		<set>
+			<if test="relations.isActive !=null">
+				isActive = #{relations.isActive},
+			</if>
+			<if test="relations.owner !=null">
+				owner = #{relations.owner},
+			</if>
+			<if test="relations.status !=null">
+				status = #{relations.status},
+			</if>
+			<if test="relations.effectiveDate !=null">
+				effectiveDate = #{relations.effectiveDate},
+			</if>
+			<if test="relations.expirationDate !=null">
+				expirationDate = #{relations.expirationDate},
+			</if>
+			<if test="entryStateUId !=null">
+				entryStateGuid = #{entryStateUId}
+			</if>
+		</set>
+
+		WHERE 
+			rel.relationGuid = #{uid}
+		AND
+			rel.codingSchemeGuid = #{codingSchemeUId}
+ 	</update> 	
+ 	
+    <delete id="deleteRelationByUId" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameter">
+		DELETE FROM
+			${prefix}relation
+		WHERE
+			relationGuid = #{param1}
+	</delete>
+	
+	<select id="getEntryStateUIdByRelationUId" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameter" resultMap="Common.uidResult">
+		SELECT 
+			entryStateGuid AS uidKey
+		FROM
+			${prefix}relation rel
+		WHERE
+			rel.relationGuid = #{param1}	
+	</select>	 
+
+	<select id="checkIfAssociationPredicateExists" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameter" resultType="string">
+		SELECT 
+			count(1)			
+		FROM
+			${prefix}associationPredicate assn
+		WHERE
+			assn.associationPredicateGuid = #{param1}	
+	</select>	 
+
+ 	<update id="updateRelationEntryStateUId" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameterTuple">
+		UPDATE
+			${prefix}relation
+		SET
+			entryStateGuid = #{param2}
+		WHERE 
+			relationGuid = #{param1}
+ 	</update>
+ 	
+	<select id="getRelationLatestRevisionIdByUId" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameter" resultType="string">
+		SELECT 
+			rev.revisionId
+		FROM
+			${prefix}relation rel,
+			${prefix}entryState es,
+			${defaultPrefix}revision rev
+		WHERE
+			rel.relationGuid = #{param1}	
+		AND
+			rel.entryStateGuid = es.entryStateGuid	
+		AND
+			es.revisionGuid = rev.revisionGuid	
+	</select> 
+</mapper>
