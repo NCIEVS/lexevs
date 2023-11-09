@@ -115,19 +115,6 @@
 		)
   </insert>
 
-	
-   <insert id="insertAssociationPredicate" parameterType="org.lexevs.dao.database.ibatis.association.parameter.InsertAssociationPredicateBean">
-   		INSERT INTO ${prefix}associationPredicate (
-   			associationPredicateGuid,
-   			relationGuid,
-   			associationName
-   		) VALUES (
-   			#{uid},
-   			#{relationUId},
-   			#{associationPredicate.associationName,jdbcType=VARCHAR}
-   		)
-   </insert>
-
    
    	<select id="getAssociationPredicatNamesFromCodingSchemeUid" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameterTuple" resultType="String">
 		SELECT DISTINCT

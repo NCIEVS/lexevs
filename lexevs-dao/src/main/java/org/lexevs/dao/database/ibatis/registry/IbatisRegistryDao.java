@@ -11,6 +11,7 @@ import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.lexevs.dao.database.access.registry.RegistryDao;
 import org.lexevs.dao.database.ibatis.AbstractIbatisDao;
 import org.lexevs.dao.database.ibatis.parameter.PrefixedParameter;
+import org.lexevs.dao.database.ibatis.parameter.PrefixedParameterTuple;
 import org.lexevs.dao.database.ibatis.registry.parameter.InsertOrUpdateRegistryBean;
 import org.lexevs.dao.database.ibatis.registry.parameter.InsertOrUpdateRegistryEntryBean;
 import org.lexevs.dao.database.schemaversion.LexGridSchemaVersion;
@@ -154,9 +155,7 @@ public class IbatisRegistryDao extends AbstractIbatisDao implements RegistryDao 
 	 * @see org.lexevs.dao.database.access.registry.RegistryDao#getRegistryEntryForUriAndVersion(java.lang.String, java.lang.String)
 	 */
 	public RegistryEntry getRegistryEntryForUriAndVersion(String uri, String version) throws LBParameterException {
-		RegistryEntry entry = new RegistryEntry();
-		entry.setResourceUri(uri);
-		entry.setResourceVersion(version);
+		PrefixedParameterTuple param = new PrefixedParameterTuple(defaultPrefix, uri, version);
 		List<RegistryEntry> entries = this.getSqlSessionTemplate().selectList(GET_REGISTRY_ENTRY_FOR_URI_AND_VERSION, entry);
 		if(entries == null || entries.size() == 0){
 			throw new LBParameterException("No entry for: " + uri
