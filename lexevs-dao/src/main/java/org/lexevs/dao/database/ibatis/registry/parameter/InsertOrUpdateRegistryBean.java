@@ -16,7 +16,6 @@ public class InsertOrUpdateRegistryBean extends IdableParameterBean {
 	/** The relations. */
 	private Registry registry;
 	
-
 	/** The id. */
 	private int id = 0;
 
@@ -25,6 +24,17 @@ public class InsertOrUpdateRegistryBean extends IdableParameterBean {
 	private String lastUsedDbIdentifer;
 	
 	private String lastUsedHistoryIdentifer;
+	
+	public InsertOrUpdateRegistryBean() {
+		super();
+	}
+
+	public InsertOrUpdateRegistryBean(Registry registry2) {
+		id = registry.getId();
+		lastUpdateTime = registry.getLastUpdateTime();
+		lastUsedDbIdentifer = registry.getLastUsedDbIdentifer();
+		lastUsedHistoryIdentifer = registry.getLastUsedHistoryIdentifer();
+	}
 
 	public Registry getRegistry() {
 		return registry;

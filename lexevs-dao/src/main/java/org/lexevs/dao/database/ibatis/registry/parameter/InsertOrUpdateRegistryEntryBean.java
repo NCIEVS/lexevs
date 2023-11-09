@@ -48,13 +48,10 @@ public class InsertOrUpdateRegistryEntryBean extends IdableParameterBean {
 
 	private String stagingPrefix;
 
-	@Enumerated(EnumType.STRING)
-	@Column(name = "resourceType")
 	private ResourceType resourceType;
 	
 	private String resourceVersion;
 
-	@Column(name = "resourceURI")
 	private String resourceUri;
 
 	private String status;
@@ -64,6 +61,48 @@ public class InsertOrUpdateRegistryEntryBean extends IdableParameterBean {
 	private String supplementsUri;
 	
 	private String supplementsVersion;
+
+	public InsertOrUpdateRegistryEntryBean(RegistryEntry entry) {
+		id = entry.getId();
+		
+		activationDate = entry.getActivationDate();
+		
+		baseRevision = entry.getBaseRevision();
+
+		dbName = entry.getDbName();
+		
+		dbSchemaDescription = entry.getDbSchemaDescription();
+		
+		dbSchemaVersion = entry.getDbSchemaVersion();
+		
+		dbUri = entry.getDbUri();
+		
+		deactivationDate = entry.getDeactivationDate();
+		
+		fixedAtRevision = entry.getFixedAtRevision();
+		
+		isLocked = entry.getIsLocked();
+		
+		lastUpdateDate = entry.getLastUpdateDate();
+		
+		prefix = entry.getPrefix();
+
+		stagingPrefix = entry.getStagingPrefix();
+
+		resourceType = entry.getResourceType();
+		
+		resourceVersion = entry.getBaseRevision();
+
+		resourceUri = entry.getResourceUri();
+
+		status = entry.getStatus();
+		
+		tag = entry.getTag();
+		
+		supplementsUri = entry.getSupplementsUri();
+		
+		supplementsVersion = entry.getSupplementsVersion();
+	}
 
 	public RegistryEntry getRegistryEntry() {
 		return registryEntry;

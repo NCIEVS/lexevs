@@ -8,7 +8,7 @@
 		<result property="id" column="id"/>
 		<result property="lastUpdateTime" column="lastUpdateTime"/>
 		<result property="lastUsedDbIdentifer" column="lastUsedDBIdentifer"/>
-		<result property="astUsedHistoryIdentifer" column="lastUsedHistoryIdentifer"/>
+		<result property="lastUsedHistoryIdentifer" column="lastUsedHistoryIdentifer"/>
 	</resultMap>
 	
 	<resultMap id="registryEntry" type="registryEntry">
@@ -34,49 +34,88 @@
 		<result property="supplementsVersion" column="supplementsVersion"/>
 	</resultMap>
 	
-	<select id="updateLastUpdateTime" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameter" resultMap="relationAttributes">
-		UPDATE INTO
-			${defaultPrefix}registryMetaData
+	<update id="updateLastUpdateTime" parameterType="org.lexevs.dao.database.ibatis.registry.parameter.InsertOrUpdateRegistryBean">
+		UPDATE 
+			${defaultPrefix}registryMetaData registryMetaData
+			registryMetaData.lastUpdateTime
+			<set>
+			<if test="lastUpdateTime != null">
+				lastUpdateTime = #{registry.lastUpdateTime},
+			</if>
+			</set>
 		WHERE 
-			id = #{param2}		
-     </select>
+			id = #{registry.id}		
+     </update>
      
-     <insert id="insertRegistry" parameterType="org.lexevs.dao.database.ibatis.association.parameter.InsertOrUpdateRelationsBean">
-		INSERT INTO ${prefix}relation (
-			relationGuid,
-			codingSchemeGuid,
-			containerName,
-			isMapping,
-			sourceCodingScheme,
-			sourceCodingSchemeVersion,
-			targetCodingScheme,
-			targetCodingSchemeVersion,
-			description,
-			isActive,
-			owner,
-			status,
-			effectiveDate,
-			expirationDate,
-			entryStateGuid
+     
+   <select id="getRegistryEntry" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameter" resultMap="registryMetaData">
+   		SELECT 
+   			id,
+   			lastUpdateTime,
+   			lastUsedDBIdentifer,
+   			lastUsedHistoryIdentifer
+   		FROM
+   			${defaultPrefix}registryMetaData
+   		WHERE
+   			id = ${param1}
+   </select>
+   
+      	
+    <delete id="deleteRegistryEntry" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameter">
+		DELETE FROM
+			${defaultPrefix}registry
+		WHERE
+			relationGuid = #{param1}
+	</delete>
+     
+   <insert id="insertRegistryEntry" parameterType="org.lexevs.dao.database.ibatis.registry.parameter.InsertOrUpdateRegistryEntryBean">
+		INSERT INTO ${defaultPrefix}registry(
+		registryGuid,
+		activationDate,
+		baseRevision,
+		dbName,
+		dbSchemaDescription,
+		dbSchemaVersion,
+		dbURI,
+		deactivationDate,
+		fixedAtRevision,
+		isLocked,
+		lastUpdateDate,
+		prefix,
+		stagingPrefix,
+		resourceType,
+		resourceVersion,
+		resourceURI,
+		status,
+		tag,
+		supplementsUri,
+		supplementsVersion
+		
 		) VALUES (
-			#{relationGuid}, 
-			#{codingSchemeGuid},
-			#{containerName}, 
-			#{isMapping},
-			#{sourceCodingScheme,jdbcType=VARCHAR}, 
-			#{sourceCodingSchemeVersion,jdbcType=VARCHAR}, 
-			#{targetCodingScheme,jdbcType=VARCHAR}, 
-			#{targetCodingSchemeVersion,jdbcType=VARCHAR}, 
-			#{description,jdbcType=VARCHAR},			
-			#{isActive},
-			#{owner,jdbcType=VARCHAR},
-			#{status,jdbcType=VARCHAR},
-			#{effectiveDate,jdbcType=TIMESTAMP},
-			#{expirationDate,jdbcType=TIMESTAMP},
-			#{entryStateUId}
+		
+		#{id,jdbcType=VARCHAR}, 
+		#{activationDate,jdbcType=TIMESTAMP}, 
+		#{baseRevision,jdbcType=VARCHAR}, 
+		#{dbName,jdbcType=VARCHAR}, 
+		#{dbSchemaDescription,jdbcType=VARCHAR}, 
+		#{dbSchemaVersion,jdbcType=VARCHAR}, 
+		#{dbUri,jdbcType=VARCHAR}, 
+		#{deactivationDate,jdbcType=TIMESTAMP}, 
+		#{fixedAtRevision,jdbcType=VARCHAR}, 
+		#{isLocked,jdbcType=CHAR}, 
+		#{lastUpdateDate,jdbcType=TIMESTAMP}, 
+		#{prefix,jdbcType=VARCHAR}, 
+		#{stagingPrefix,jdbcType=VARCHAR}, 
+		#{resourceType,jdbcType=VARCHAR}, 
+		#{resourceVersion,jdbcType=VARCHAR}, 
+		#{resourceUri,jdbcType=VARCHAR}, 
+		#{status,jdbcType=VARCHAR}, 
+		#{tag,jdbcType=VARCHAR}, 
+		#{supplementsUri,jdbcType=VARCHAR}
 		)
   </insert>
-  
+
+	
    <insert id="insertAssociationPredicate" parameterType="org.lexevs.dao.database.ibatis.association.parameter.InsertAssociationPredicateBean">
    		INSERT INTO ${prefix}associationPredicate (
    			associationPredicateGuid,
@@ -89,24 +128,6 @@
    		)
    </insert>
 
-   <select id="getAssociationPredicateUidsForName" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameterTriple" resultMap="Common.uidResult">
-   		SELECT
-   			associationPredicateGuid AS uidKey
-   		FROM
-   			${prefix}associationPredicate associationPredicate
-   		INNER JOIN
-			${prefix}relation relation
-		ON 
-			(relation.relationGuid = associationPredicate.relationGuid)
-		WHERE
-			relation.codingSchemeGuid = #{param1}
-		<if test="param2 != null">
-		AND
-			relation.containerName = #{param2}
-		</if>
-		AND
-			associationPredicate.associationName = #{param3}
-   </select>
    
    	<select id="getAssociationPredicatNamesFromCodingSchemeUid" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameterTuple" resultType="String">
 		SELECT DISTINCT
