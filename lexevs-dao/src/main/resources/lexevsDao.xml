@@ -494,13 +494,17 @@
 		<property name="databaseServiceManager" ref="databaseServiceManager"/>
 	</bean>
 	
-	<bean id="hibernateRegistryDao" class="org.lexevs.dao.database.hibernate.registry.HibernateRegistryDao">
+<!-- 	<bean id="ibatisRegistryDao" class="org.lexevs.dao.database.hibernate.registry.HibernateRegistryDao">
 		<property name="hibernateTemplate" ref="hibernateTemplate"/>
+	</bean> -->
+	
+		<bean id="ibatisRegistryDao" class="org.lexevs.dao.database.ibatis.registry.IbatisRegistryDao">
+		<property name="defaultPrefixResolver" ref="defaultPrefixResolver"/>
 	</bean>
 
-	<bean id="hibernateTemplate" class="org.springframework.orm.hibernate5.HibernateTemplate">
+<!-- 	<bean id="hibernateTemplate" class="org.springframework.orm.hibernate5.HibernateTemplate">
 		<property name="sessionFactory" ref="registrySessionFactory"/>
-	</bean>
+	</bean> -->
 	
 	<bean id="unPooledDataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource" >
 		<property name="driverClass" ref="jdbcDriverClass" />
@@ -775,7 +779,7 @@
 
 	
 	<bean id="databaseRegistry" class="org.lexevs.registry.service.DatabaseRegistry">
-		<property name="registryDao" ref="hibernateRegistryDao"/>
+		<property name="registryDao" ref="ibatisRegistryDao"/>
 		<property name="nextDatabasePrefixGenerator" ref="cyclingCharDbPrefixGenerator"/>
 	</bean>
 	
@@ -825,7 +829,7 @@
 		<property name="lexGridSchemaInstalled" ref="lexGridSchemaCheckFactory"/>
 		<property name="systemVariables" ref="systemVariables"/> 
 		<property name="lexEvsDatabaseOperations" ref="defaultLexEvsDatabaseOperations"/>
-		<property name="registryDao" ref="hibernateRegistryDao"/>
+		<property name="registryDao" ref="ibatisRegistryDao"/>
 		<property name="primaryKeyIncrementer" ref="primaryKeyIncrementer"/>
 	</bean>
 	

@@ -5,15 +5,18 @@ package org.lexevs.dao.database.ibatis.registry;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 
 import org.lexevs.dao.database.access.registry.RegistryDao;
 import org.lexevs.dao.database.ibatis.AbstractIbatisDao;
 import org.lexevs.dao.database.ibatis.parameter.PrefixedParameter;
+import org.lexevs.dao.database.ibatis.parameter.PrefixedParameterCollection;
 import org.lexevs.dao.database.ibatis.parameter.PrefixedParameterTuple;
 import org.lexevs.dao.database.ibatis.registry.parameter.InsertOrUpdateRegistryBean;
 import org.lexevs.dao.database.ibatis.registry.parameter.InsertOrUpdateRegistryEntryBean;
+import org.lexevs.dao.database.prefix.DefaultPrefixResolver;
 import org.lexevs.dao.database.schemaversion.LexGridSchemaVersion;
 import org.lexevs.registry.model.Registry;
 import org.lexevs.registry.model.RegistryEntry;
@@ -43,7 +46,7 @@ public class IbatisRegistryDao extends AbstractIbatisDao implements RegistryDao 
 
 	private static final String DELETE_REGISTRY_ENTRY = REGISTRY_NAMESPACE + "deleteRegistryEntry";
 
-	private static final String GET_REGISTRY_ENTRY = REGISTRY_NAMESPACE + "getRegistryEntry";
+	private static final String GET_REGISTRY_METADATA = REGISTRY_NAMESPACE + "getRegistryMetaData";
 
 	private static final String INSERT_REGISTRY_ENTRY = REGISTRY_NAMESPACE + "insertRegistryEntry";
 
@@ -56,6 +59,8 @@ public class IbatisRegistryDao extends AbstractIbatisDao implements RegistryDao 
 	private static final String GET_REGISTRY_ENTRIES_BY_TYPE = REGISTRY_NAMESPACE + "";
 
 	private static final String GET_REGISTRY_ENTRIES_BY_TYPE_AND_URI = REGISTRY_NAMESPACE + "";
+	
+	private static final String GET_REGISTRY_ENTRIES_BY_URI_AND_TYPES = REGISTRY_NAMESPACE + "getRegistryEntryByUriAndTypes";
 
 	private static final String GET_REGISTRY_ENTRIES_BY_URI = REGISTRY_NAMESPACE + "";
 
@@ -70,6 +75,8 @@ public class IbatisRegistryDao extends AbstractIbatisDao implements RegistryDao 
 	
 	/** The default coding scheme prefix. */
 	private String defaultCodingSchemePrefix = "aaaa";
+	
+	DefaultPrefixResolver prefixResolver;
 	
 	@PersistenceContext
 	EntityManager entityManager;
@@ -101,7 +108,7 @@ public class IbatisRegistryDao extends AbstractIbatisDao implements RegistryDao 
 	protected Registry getRegistryMetadataEntry(){
 		PrefixedParameter param = new PrefixedParameter();
 		param.setParam1(Character.toString(REGISTRY_ID));
-		return (Registry)this.getSqlSessionTemplate().selectOne(GET_REGISTRY_ENTRY, param);
+		return (Registry)this.getSqlSessionTemplate().selectOne(GET_REGISTRY_METADATA, param);
 	}
 
 	/* (non-Javadoc)
@@ -155,8 +162,11 @@ public class IbatisRegistryDao extends AbstractIbatisDao implements RegistryDao 
 	 * @see org.lexevs.dao.database.access.registry.RegistryDao#getRegistryEntryForUriAndVersion(java.lang.String, java.lang.String)
 	 */
 	public RegistryEntry getRegistryEntryForUriAndVersion(String uri, String version) throws LBParameterException {
-		PrefixedParameterTuple param = new PrefixedParameterTuple(defaultPrefix, uri, version);
-		List<RegistryEntry> entries = this.getSqlSessionTemplate().selectList(GET_REGISTRY_ENTRY_FOR_URI_AND_VERSION, entry);
+		RegistryEntry entry = new RegistryEntry();
+		entry.setResourceUri(uri);
+		entry.setResourceVersion(version);
+		InsertOrUpdateRegistryEntryBean regEntry = new InsertOrUpdateRegistryEntryBean(entry);
+		List<RegistryEntry> entries = this.getSqlSessionTemplate().selectList(GET_REGISTRY_ENTRY_FOR_URI_AND_VERSION, regEntry);
 		if(entries == null || entries.size() == 0){
 			throw new LBParameterException("No entry for: " + uri
 					+ " - version " + version);
@@ -167,19 +177,27 @@ public class IbatisRegistryDao extends AbstractIbatisDao implements RegistryDao 
 		return entries.get(0);
 	}
 	
-	@SuppressWarnings("unchecked")
+
 	public List<RegistryEntry> getAllRegistryEntriesOfUriAndTypes(String uri,
-			ResourceType... types) {
-		
-		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-
-		CriteriaQuery<RegistryEntry> criteria = builder.createQuery(RegistryEntry.class);
-		Root<RegistryEntry> root = criteria.from(RegistryEntry.class);
-		criteria.select(root);
-		criteria.where(builder.in(root.get("resourceType").in(types)));
-		criteria.where(builder.equal(root.get("resourceUri"),uri));
-
-		List<RegistryEntry> entries = entityManager.createQuery(criteria).getResultList();
+			ResourceType[] types) {
+		PrefixedParameterCollection param = new PrefixedParameterCollection(
+				prefixResolver.resolveDefaultPrefix(), 
+				uri, 
+				Stream.
+					of(types).
+					map(x -> x.name()).
+					toList());
+		return this.getSqlSessionTemplate().selectList(GET_REGISTRY_ENTRIES_BY_URI_AND_TYPES, param);
+//		
+//		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+//
+//		CriteriaQuery<RegistryEntry> criteria = builder.createQuery(RegistryEntry.class);
+//		Root<RegistryEntry> root = criteria.from(RegistryEntry.class);
+//		criteria.select(root);
+//		criteria.where(builder.in(root.get("resourceType").in(types)));
+//		criteria.where(builder.equal(root.get("resourceUri"),uri));
+//
+//		List<RegistryEntry> entries = entityManager.createQuery(criteria).getResultList();
 		
 //		DetachedCriteria criteria = DetachedCriteria.forClass(RegistryEntry.class);
 //
@@ -189,8 +207,10 @@ public class IbatisRegistryDao extends AbstractIbatisDao implements RegistryDao 
 //		
 //		List<RegistryEntry> entries = (List<RegistryEntry>) this.getSqlSessionTemplate().findByCriteria(		
 //				criteria.add(Restrictions.and(uriRestriction, typeRestriction)));
+		
+		
 //		
-		return entries;
+
 	}
 
 	/* (non-Javadoc)

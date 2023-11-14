@@ -48,7 +48,7 @@
      </update>
      
      
-   <select id="getRegistryEntry" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameter" resultMap="registryMetaData">
+   <select id="getRegistryMetaData" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameter" resultMap="registryMetaData">
    		SELECT 
    			id,
    			lastUpdateTime,
@@ -114,23 +114,70 @@
 		#{supplementsUri,jdbcType=VARCHAR}
 		)
   </insert>
+  
+     <select id="getRegistryEntryByUriAndVersion" parameterType="org.lexevs.dao.database.ibatis.registry.parameter.InsertOrUpdateRegistryEntryBean" resultMap="registryEntry">
+   		SELECT 
+   		registryGuid AS id,
+		activationDate,
+		baseRevision,
+		dbName,
+		dbSchemaDescription,
+		dbSchemaVersion,
+		dbURI,
+		deactivationDate,
+		fixedAtRevision,
+		isLocked,
+		lastUpdateDate,
+		prefix,
+		stagingPrefix,
+		resourceType,
+		resourceVersion,
+		resourceURI AS resourceUri,
+		status,
+		tag,
+		supplementsUri,
+		supplementsVersion
+   		FROM
+   			${defaultPrefix}registry
+   		WHERE
+   			resourceURI = ${resoruceUri}
+   			AND
+   			resourceVersion = ${resourceVersion}
+   </select>
 
    
-   	<select id="getAssociationPredicatNamesFromCodingSchemeUid" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameterTuple" resultType="String">
-		SELECT DISTINCT
-			associationPredicate.associationName
-		FROM
-			${prefix}associationPredicate associationPredicate
-		INNER JOIN
-			${prefix}relation relation
-		ON 
-			(relation.relationGuid = associationPredicate.relationGuid)
+   	<select id="getRegistryEntryByUriAndTypes" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameterCollection" resultType="String">
+   		SELECT 
+   		registryGuid AS id,
+		activationDate,
+		baseRevision,
+		dbName,
+		dbSchemaDescription,
+		dbSchemaVersion,
+		dbURI,
+		deactivationDate,
+		fixedAtRevision,
+		isLocked,
+		lastUpdateDate,
+		prefix,
+		stagingPrefix,
+		resourceType,
+		resourceVersion,
+		resourceURI AS resourceUri,
+		status,
+		tag,
+		supplementsUri,
+		supplementsVersion
+   		FROM
+   			${prefix}registry
 		WHERE
-			relation.codingSchemeGuid = #{param1}
-		<if test="param2 != null">
+			resourceURI = #{param1}
+
 		AND
-			relation.containerName = #{param2}
-		</if>
+		   resourceType IN (  
+		   	<foreach collection="param2" item="item" separator=",">
+        		#{item}
+    		</foreach> )
 	</select>
    
   	<select id="getAssociationPredicateKeysForRelationsId" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameter" resultMap="Common.uidResult">
