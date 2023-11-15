@@ -40,13 +40,25 @@
 			registryMetaData.lastUpdateTime
 			<set>
 			<if test="lastUpdateTime != null">
-				lastUpdateTime = #{registry.lastUpdateTime},
+				lastUpdateTime = #{registry.lastUpdateTime}
 			</if>
 			</set>
 		WHERE 
 			id = #{registry.id}		
      </update>
      
+   <update id="updateLastUsedDbId" parameterType="org.lexevs.dao.database.ibatis.registry.parameter.InsertOrUpdateRegistryBean">
+		UPDATE 
+			${defaultPrefix}registryMetaData registryMetaData
+			registryMetaData.lastUsedDBIdentifer
+			<set>
+			<if test="lastUsedDBIdentifer != null">
+				lastUsedDBIdentifer = #{lastUsedDBIdentifer}
+			</if>
+			</set>
+		WHERE 
+			id = #{id}		
+     </update> 
      
    <select id="getRegistryMetaData" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameter" resultMap="registryMetaData">
    		SELECT 
@@ -180,47 +192,103 @@
     		</foreach> )
 	</select>
    
-  	<select id="getAssociationPredicateKeysForRelationsId" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameter" resultMap="Common.uidResult">
-   		SELECT
-   			associationPredicateGuid AS uidKey
-   		FROM
-   			${prefix}associationPredicate
-		WHERE
-			relationGuid = 
-			#{param1}
+  	<update id="updateRegistryEntry" parameterType="org.lexevs.dao.database.ibatis.registry.parameter.InsertOrUpdateRegistryEntryBean" >
+   		UPDATE
+   			${prefix}registry registry
+	     <set>
+			<if test="id != null">
+			registry.registryGuid = #{id},
+			</if>
+			<if test="activationDate != null">
+			registry.activationDate = #{activationDate},
+			</if>
+			<if test="baseRevision != null">
+			registry.baseRevision = #{baseRevision},
+			</if>
+			<if test="dbName != null">
+			registry.dbName = #{dbName},
+			</if>
+			<if test="dbSchemaDescription != null">
+			registry.dbSchemaDescription = #{dbSchemaDescription},
+			</if>
+			<if test="dbSchemaVersion != null">
+			registry.dbSchemaVersion = #{dbSchemaVersion},
+			</if>
+			<if test="dbURI != null">
+			registry.dbURI = #{dbURI},
+			</if>
+			<if test="deactivationDate != null">
+			registry.deactivationDate = #{deactivationDate},
+			</if>
+			<if test="fixedAtRevision != null">
+			registry.fixedAtRevision = #{fixedAtRevision},
+			</if>
+			<if test="isLocked != null">
+			registry.isLocked = #{isLocked},
+			</if>
+			<if test="lastUpdateDate != null">
+			registry.lastUpdateDate = #{lastUpdateDate},
+			</if>
+			<if test="prefix != null">
+			registry.prefix = #{prefix},
+			</if>
+			<if test="stagingPrefix != null">
+			registry.stagingPrefix = #{stagingPrefix},
+			</if>
+			<if test="resourceType != null">
+			registry.resourceType = #{resourceType},
+			</if>
+			<if test="resourceVersion != null">
+			registry.resourceVersion = #{resourceVersion},
+			</if>
+			<if test="resourceUri != null">
+			registry.resourceURI = #{resourceUri},
+			</if>
+			<if test="status != null">
+			registry.status = #{status},
+			</if>
+			<if test="tag != null">
+			registry.tag = #{tag},
+			</if>
+			<if test="supplementsUri != null">
+			registry.supplementsUri = #{supplementsUri},
+			</if>
+			<if test="supplementsVersion != null">
+			registry.supplementsVersion = #{supplementsVersion}
+			</if>
+		</set>
+   </update>
+   
+
+   
+   <select id="getAllRegistryEntriesOfType" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameter" resultMap="registryEntry">
+     	SELECT *
+     	FROM
+     		${prefix}registry registry
+     	WHERE
+     		registry.resourceType = #{param1}
    </select>
    
-   <select id="getRelationsKey" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameterTuple" resultMap="Common.uidResult">
-   		SELECT
-   			relationGuid AS uidKey
-   		FROM
-   			${prefix}relation
-		WHERE
-			codingSchemeGuid = 
-			#{param1}
-		AND
-			containerName = 
-			#{param2}		
+    <select id="getAllRegistryEntriesOfTypeAndURI" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameter" resultMap="registryEntry">
+     	SELECT *
+     	FROM
+     		${prefix}registry registry
+     	WHERE
+     		registry.resourceType = #{param1}
+     	AND
+     		registry.resourceURI = #{param2}		
    </select>
    
-    <select id="getRelationsKeysForCodingSchemeId" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameter" resultMap="Common.uidResult">
-   		SELECT
-   			relationGuid AS uidKey
-   		FROM
-   			${prefix}relation
-		WHERE
-			codingSchemeGuid = 
-			#{param1}	
-   </select>
-   
-   <select id="getRelationsNamesForCodingSchemeId" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameter" resultType="string">
-   		SELECT
-   			containerName
-   		FROM
-   			${prefix}relation
-		WHERE
-			codingSchemeGuid = 
-			#{param1}	
+   <select id="getAllRegistryEntriesOfTypeURIAndVersion" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameterTriple" resultType="registryEntry">
+     	SELECT *
+     	FROM
+     		${prefix}registry registry
+     	WHERE
+     		registry.resourceType = #{param1}
+     	AND
+     		registry.resourceURI = #{param2}
+     	AND
+     		registry.resourceVersion = #{param3}			
    </select>
    
    <select id="getAssociationPredicateNameForId" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameter" resultType="string">

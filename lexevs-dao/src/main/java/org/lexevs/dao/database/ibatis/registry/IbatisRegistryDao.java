@@ -54,11 +54,11 @@ public class IbatisRegistryDao extends AbstractIbatisDao implements RegistryDao 
 
 	private static final String UPDATE_REGISTRY_ENTRY = REGISTRY_NAMESPACE + "";
 
-	private static final String UPDATE_LAST_USED_DB_ID = REGISTRY_NAMESPACE + "";
+	private static final String UPDATE_LAST_USED_DB_ID = REGISTRY_NAMESPACE + "updateLastUsedDbId";
 
-	private static final String GET_REGISTRY_ENTRIES_BY_TYPE = REGISTRY_NAMESPACE + "";
+	private static final String GET_REGISTRY_ENTRIES_BY_TYPE = REGISTRY_NAMESPACE + "getAllRegistryEntriesOfType";
 
-	private static final String GET_REGISTRY_ENTRIES_BY_TYPE_AND_URI = REGISTRY_NAMESPACE + "";
+	private static final String GET_REGISTRY_ENTRIES_BY_TYPE_AND_URI = REGISTRY_NAMESPACE + "getAllRegistryEntriesOfTypeAndURI";
 	
 	private static final String GET_REGISTRY_ENTRIES_BY_URI_AND_TYPES = REGISTRY_NAMESPACE + "getRegistryEntryByUriAndTypes";
 
@@ -69,6 +69,8 @@ public class IbatisRegistryDao extends AbstractIbatisDao implements RegistryDao 
 	private static final String INIT_REGISTRY_METADATA = REGISTRY_NAMESPACE + "";
 
 	private static final String UPDATE_LAST_UPDATE_TIME = REGISTRY_NAMESPACE + "updateLastUpdateTime";
+
+	private static final String GET_REGISTRY_ENTRIES_BY_TYPE_URI_AND_VERSION = REGISTRY_NAMESPACE + "getAllRegistryEntriesOfTypeURIAndVersion";
 	
 	/** The default history prefix. */
 	private String defaultHistoryPrefix = "aaaa";
@@ -233,10 +235,11 @@ public class IbatisRegistryDao extends AbstractIbatisDao implements RegistryDao 
 	public void updateLastUsedDbIdentifier(String databaseIdentifier) {
 		Registry registry = this.getRegistryMetadataEntry();
 		registry.setLastUsedDbIdentifer(databaseIdentifier);
+		InsertOrUpdateRegistryBean bean = new InsertOrUpdateRegistryBean(registry);
 		SqlSessionTemplate session = null;
-        try  { session = this.getSqlSessionTemplate();
-
-            session.update(UPDATE_LAST_USED_DB_ID, registry);
+        try  { 
+        	session = this.getSqlSessionTemplate();
+            session.update(UPDATE_LAST_USED_DB_ID, bean);
             session.commit();
         } catch (Exception e) {
             session.rollback();
@@ -248,16 +251,13 @@ public class IbatisRegistryDao extends AbstractIbatisDao implements RegistryDao 
 	 * @see org.lexevs.dao.database.access.registry.RegistryDao#getAllRegistryEntriesOfType(org.lexevs.registry.service.Registry.ResourceType)
 	 */
 	public List<RegistryEntry> getAllRegistryEntriesOfType(ResourceType type) {
-		RegistryEntry entry = new RegistryEntry();
-		entry.setResourceType(type);
-		return this.getSqlSessionTemplate().selectList(GET_REGISTRY_ENTRIES_BY_TYPE, entry);
+		PrefixedParameter bean = new PrefixedParameter(prefixResolver.resolveDefaultPrefix(), type.name());
+		return this.getSqlSessionTemplate().selectList(GET_REGISTRY_ENTRIES_BY_TYPE, bean);
 	}
 	
 	public List<RegistryEntry> getAllRegistryEntriesOfTypeAndURI(ResourceType type, String uri) {
-		RegistryEntry entry = new RegistryEntry();
-		entry.setResourceType(type);
-		entry.setResourceUri(uri);
-		return this.getSqlSessionTemplate().selectList(GET_REGISTRY_ENTRIES_BY_TYPE_AND_URI, entry);
+		PrefixedParameterTuple bean = new PrefixedParameterTuple(prefixResolver.resolveDefaultPrefix(), type.name(), uri);
+		return this.getSqlSessionTemplate().selectList(GET_REGISTRY_ENTRIES_BY_TYPE_AND_URI, bean);
 	}
 	
 	public List<RegistryEntry> getAllRegistryEntriesOfTypeURIAndVersion(ResourceType type, String uri, String version) {
@@ -265,7 +265,7 @@ public class IbatisRegistryDao extends AbstractIbatisDao implements RegistryDao 
 		entry.setResourceType(type);
 		entry.setResourceUri(uri);
 		entry.setResourceVersion(version);
-		return this.getSqlSessionTemplate().selectList(null, entry);
+		return this.getSqlSessionTemplate().selectList(GET_REGISTRY_ENTRIES_BY_TYPE_URI_AND_VERSION, entry);
 	}
 	
 	/* (non-Javadoc)
