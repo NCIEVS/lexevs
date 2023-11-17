@@ -30,6 +30,7 @@ public class InsertOrUpdateRegistryBean extends IdableParameterBean {
 	}
 
 	public InsertOrUpdateRegistryBean(Registry registry2) {
+		super();
 		id = registry.getId();
 		lastUpdateTime = registry.getLastUpdateTime();
 		lastUsedDbIdentifer = registry.getLastUsedDbIdentifer();

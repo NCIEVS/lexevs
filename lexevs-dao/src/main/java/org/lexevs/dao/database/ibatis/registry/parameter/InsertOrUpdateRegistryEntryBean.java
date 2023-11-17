@@ -61,8 +61,14 @@ public class InsertOrUpdateRegistryEntryBean extends IdableParameterBean {
 	private String supplementsUri;
 	
 	private String supplementsVersion;
+	
+	public InsertOrUpdateRegistryEntryBean() {
+		super();
+	}
 
 	public InsertOrUpdateRegistryEntryBean(RegistryEntry entry) {
+		super();
+		
 		id = entry.getId();
 		
 		activationDate = entry.getActivationDate();

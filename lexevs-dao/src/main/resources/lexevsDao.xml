@@ -3,14 +3,11 @@
    xmlns:util="http://www.springframework.org/schema/util"
    xmlns:aop="http://www.springframework.org/schema/aop"
    xmlns:tx="http://www.springframework.org/schema/tx"
-   xmlns:jpa="http://www.springframework.org/schema/data/jpa"
    xsi:schemaLocation="
    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
-   http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
-   http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
-   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">	
+   http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 	
 	<import resource="classpath:lexevsCache.xml"/> 
 
@@ -498,8 +495,9 @@
 		<property name="hibernateTemplate" ref="hibernateTemplate"/>
 	</bean> -->
 	
-		<bean id="ibatisRegistryDao" class="org.lexevs.dao.database.ibatis.registry.IbatisRegistryDao">
-		<property name="defaultPrefixResolver" ref="defaultPrefixResolver"/>
+	<bean id="ibatisRegistryDao" class="org.lexevs.dao.database.ibatis.registry.IbatisRegistryDao">
+		<property name="prefixResolver" ref="defaultPrefixResolver"/>
+		<property name="sqlSessionTemplate" ref="sqlSessionTemplate"/>
 	</bean>
 
 <!-- 	<bean id="hibernateTemplate" class="org.springframework.orm.hibernate5.HibernateTemplate">
@@ -650,7 +648,7 @@
    		<property name="prefixResolver" ref="defaultPrefixResolver"/>
    		<property name="dataSource" ref="dataSource"/>
    		<property name="databaseType" ref="databaseTypeFactory"/>
-   		<property name="transactionManager" ref="transactionManager"/>
+<!--    		<property name="transactionManager" ref="transactionManager"/> -->
    		<property name="transitivityBuilder" ref="defaultTransitivityBuilder"/>
    		<property name="rootBuilder" ref="defaultRootBuilder"/>
    		<property name="systemVariables" ref="systemVariables"/>
@@ -720,63 +718,17 @@
 		<property name="xmlRegistry" ref="xmlRegistry"/>
 	</bean>
 	
-	<!-- <bean id="registrySessionFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+	<bean id="registrySessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
 		<property name="dataSource">
 			<ref bean="dataSource" />
 		</property>
 		<property name="entityInterceptor" ref="prefixInterceptor"/>
 		<property name="configLocations" value="classpath:hibernate/registry/hibernate.cfg.xml"/>
 	</bean>
- -->
+
 	<bean id="prefixInterceptor" class="org.lexevs.dao.database.hibernate.prefix.PrefixInterceptor">
 		<property name="prefixResolver" ref="defaultPrefixResolver"/>
 	</bean>
-	
-
-  <!-- Create default configuration for Hibernate -->
-  <bean id="hibernateJpaVendorAdapter" 
-    class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
-
-  <!-- Configure the entity manager factory bean -->
-  <bean id="registrySessionFactory" 
-    class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-    	<property name="dataSource">
-			<ref bean="dataSource" />
-		</property>
-<!-- 		<property name="entityInterceptor" ref="prefixInterceptor"/>
-		<property name="configLocations" value="classpath:hibernate/registry/hibernate.cfg.xml"/> -->
-    <property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter"/>
-    <!-- Set JPA properties -->
-    <property name="jpaProperties">
-      <props>
-        <prop key="hibernate.dialect">org.hibernate.dialect.MySQL57Dialect</prop>
-        <prop key="javax.persistence.schema-generation.database.action">none</prop>
-        <prop key="hibernate.ejb.use_class_enhancer">true</prop>
-      </props>
-    </property>
-    <!-- Set base package of your entities -->
-    <property name="packagesToScan" value="org.lexevs.registry.model"/>
-    <!-- Set share cache mode -->
-    <property name="sharedCacheMode" value="ENABLE_SELECTIVE"/>
-    <!-- Set validation mode -->
-    <property name="validationMode" value="NONE"/>
-  </bean>
-
-  <!-- Configure the transaction manager bean -->
-  <bean id="transactionManager" 
-    class="org.springframework.orm.jpa.JpaTransactionManager">
-    <property name="registrySessionFactory" ref="registrySessionFactory"/>
-  </bean>
-
-  <!-- Enable annotation driven transaction management -->
-  <tx:annotation-driven/>
-
-  <!-- 
-    Configure Spring Data JPA and set the base package of the 
-    repository interfaces 
-  -->
-  <jpa:repositories base-package="foo.bar.repository"/>
-
 	
 	<bean id="databaseRegistry" class="org.lexevs.registry.service.DatabaseRegistry">
 		<property name="registryDao" ref="ibatisRegistryDao"/>
@@ -845,8 +797,8 @@
 		<property name="systemVariables" ref="systemVariables"/>
 	</bean>
 	
-	<tx:annotation-driven proxy-target-class="true" transaction-manager="transactionManager"/>
-	
+	<!-- <tx:annotation-driven proxy-target-class="true" transaction-manager="transactionManager"/>
+	 -->
 	<bean id="databaseTypeFactory" class="org.lexevs.dao.database.type.DatabaseTypeFactory">
 		<property name="dataSource" ref="dataSource"/>
 	</bean>
