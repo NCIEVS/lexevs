@@ -40,7 +40,7 @@ import jakarta.persistence.criteria.Root;
  * 
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
-//@Transactional(readOnly=false)
+@Transactional(readOnly=false)
 public class IbatisRegistryDao extends AbstractIbatisDao implements RegistryDao {
 	
 	/** The Constant REGISTRY_ID. */
@@ -68,7 +68,7 @@ public class IbatisRegistryDao extends AbstractIbatisDao implements RegistryDao 
 
 	private static final String GET_REGISTRY_ENTRIES_BY_URI = REGISTRY_NAMESPACE + "getRegistryEntriesForUri";
 
-	private static final String GET_ALL_REGISTRY_ENTRIES = REGISTRY_NAMESPACE + "getAllRegistryEntries()";
+	private static final String GET_ALL_REGISTRY_ENTRIES = REGISTRY_NAMESPACE + "getAllRegistryEntries";
 
 	private static final String INIT_REGISTRY_METADATA = REGISTRY_NAMESPACE + "initRegistryMetadata";
 
@@ -127,9 +127,9 @@ public class IbatisRegistryDao extends AbstractIbatisDao implements RegistryDao 
         	session = this.getSqlSessionTemplate();
         	PrefixedParameter param = new PrefixedParameter(prefixResolver.resolveDefaultPrefix(), entry.getId());
             session.delete(DELETE_REGISTRY_ENTRY, param);
-            session.commit();
+//            session.commit();
         } catch (Exception e) {
-           session.rollback();
+//           session.rollback();
             e.printStackTrace();
         }
 	}
@@ -160,7 +160,7 @@ public class IbatisRegistryDao extends AbstractIbatisDao implements RegistryDao 
             session.insert(INSERT_REGISTRY_ENTRY, param);
 
         } catch (Exception e) {
-           session.rollback();
+ //          session.rollback();
             e.printStackTrace();
         }
 	}
@@ -222,11 +222,12 @@ public class IbatisRegistryDao extends AbstractIbatisDao implements RegistryDao 
 	 */
 	public void updateRegistryEntry(RegistryEntry entry) {
 		SqlSessionTemplate session = null;
+		InsertOrUpdateRegistryEntryBean param = new InsertOrUpdateRegistryEntryBean(entry);
         try {session = this.getSqlSessionTemplate();
-            session.update(UPDATE_REGISTRY_ENTRY,entry);
-            session.commit();
+            session.update(UPDATE_REGISTRY_ENTRY,param);
+//            session.commit();
         } catch (Exception e) {
-           session.rollback();
+//           session.rollback();
             e.printStackTrace();
         }
 	}
@@ -242,9 +243,9 @@ public class IbatisRegistryDao extends AbstractIbatisDao implements RegistryDao 
         try  { 
         	session = this.getSqlSessionTemplate();
             session.update(UPDATE_LAST_USED_DB_ID, bean);
-            session.commit();
+//            session.commit();
         } catch (Exception e) {
-            session.rollback();
+//            session.rollback();
             e.printStackTrace();
         }	
 	}
@@ -305,9 +306,9 @@ public class IbatisRegistryDao extends AbstractIbatisDao implements RegistryDao 
         try {session = this.getSqlSessionTemplate(); 
 
             session.insert(INIT_REGISTRY_METADATA, param);
-            session.commit();
+//            session.commit();
         } catch (Exception e) {
-            session.rollback();
+//            session.rollback();
             e.printStackTrace();
         }
 	}

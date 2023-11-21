@@ -165,8 +165,8 @@
 			<if test="dbSchemaVersion != null">
 			registry.dbSchemaVersion = #{dbSchemaVersion},
 			</if>
-			<if test="dbURI != null">
-			registry.dbURI = #{dbURI},
+			<if test="dbUri != null">
+			registry.dbURI = #{dbUri},
 			</if>
 			<if test="deactivationDate != null">
 			registry.deactivationDate = #{deactivationDate},
@@ -208,8 +208,38 @@
 			registry.supplementsVersion = #{supplementsVersion}
 			</if>
 		</set>
+		WHERE
+			registry.registryGuid = #{id}
    </update>
    
+	 <select id="getRegistryEntriesForUri" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameter" resultMap="registryEntry">
+	 	SELECT 
+	   		registryGuid AS id,
+			activationDate,
+			baseRevision,
+			dbName,
+			dbSchemaDescription,
+			dbSchemaVersion,
+			dbURI,
+			deactivationDate,
+			fixedAtRevision,
+			isLocked,
+			lastUpdateDate,
+			prefix,
+			stagingPrefix,
+			resourceType,
+			resourceVersion,
+			resourceURI AS resourceUri,
+			status,
+			tag,
+			supplementsUri,
+			supplementsVersion
+   		FROM
+   			${prefix}registry
+   		WHERE
+   			resourceURI = #{param1}
+	 </select>  
+	  
      <select id="getRegistryEntryForUriAndVersion" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameterTuple" resultMap="registryEntry">
    		SELECT 
    		registryGuid AS id,
