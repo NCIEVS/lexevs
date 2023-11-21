@@ -13,6 +13,8 @@ import org.lexevs.dao.database.access.registry.RegistryDao;
 import org.lexevs.dao.database.ibatis.AbstractIbatisDao;
 import org.lexevs.dao.database.ibatis.parameter.PrefixedParameter;
 import org.lexevs.dao.database.ibatis.parameter.PrefixedParameterCollection;
+import org.lexevs.dao.database.ibatis.parameter.PrefixedParameterQuad;
+import org.lexevs.dao.database.ibatis.parameter.PrefixedParameterTriple;
 import org.lexevs.dao.database.ibatis.parameter.PrefixedParameterTuple;
 import org.lexevs.dao.database.ibatis.registry.parameter.InsertOrUpdateRegistryBean;
 import org.lexevs.dao.database.ibatis.registry.parameter.InsertOrUpdateRegistryEntryBean;
@@ -52,9 +54,9 @@ public class IbatisRegistryDao extends AbstractIbatisDao implements RegistryDao 
 
 	private static final String INSERT_REGISTRY_ENTRY = REGISTRY_NAMESPACE + "insertRegistryEntry";
 
-	private static final String GET_REGISTRY_ENTRY_FOR_URI_AND_VERSION = REGISTRY_NAMESPACE + "";
+	private static final String GET_REGISTRY_ENTRY_FOR_URI_AND_VERSION = REGISTRY_NAMESPACE + "getRegistryEntryForUriAndVersion";
 
-	private static final String UPDATE_REGISTRY_ENTRY = REGISTRY_NAMESPACE + "";
+	private static final String UPDATE_REGISTRY_ENTRY = REGISTRY_NAMESPACE + "updateRegistryEntry";
 
 	private static final String UPDATE_LAST_USED_DB_ID = REGISTRY_NAMESPACE + "updateLastUsedDbId";
 
@@ -261,11 +263,8 @@ public class IbatisRegistryDao extends AbstractIbatisDao implements RegistryDao 
 	}
 	
 	public List<RegistryEntry> getAllRegistryEntriesOfTypeURIAndVersion(ResourceType type, String uri, String version) {
-		RegistryEntry entry = new RegistryEntry();
-		entry.setResourceType(type);
-		entry.setResourceUri(uri);
-		entry.setResourceVersion(version);
-		return this.getSqlSessionTemplate().selectList(GET_REGISTRY_ENTRIES_BY_TYPE_URI_AND_VERSION, entry);
+		PrefixedParameterTriple param = new PrefixedParameterTriple(prefixResolver.resolveDefaultPrefix(),type.name(), uri, version);
+		return this.getSqlSessionTemplate().selectList(GET_REGISTRY_ENTRIES_BY_TYPE_URI_AND_VERSION, param);
 	}
 	
 	/* (non-Javadoc)

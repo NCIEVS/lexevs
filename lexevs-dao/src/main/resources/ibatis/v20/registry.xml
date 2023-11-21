@@ -210,7 +210,7 @@
 		</set>
    </update>
    
-     <select id="getRegistryEntryByUriAndVersion" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameterTuple" resultMap="registryEntry">
+     <select id="getRegistryEntryForUriAndVersion" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameterTuple" resultMap="registryEntry">
    		SELECT 
    		registryGuid AS id,
 		activationDate,
@@ -241,7 +241,7 @@
    </select>
 
    
-   	<select id="getRegistryEntryByUriAndTypes" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameterCollection" resultType="String">
+   	<select id="getRegistryEntryByUriAndTypes" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameterCollection" resultType="registryEntry">
    		SELECT 
    		registryGuid AS id,
 		activationDate,
@@ -297,7 +297,27 @@
    </select>
    
    <select id="getAllRegistryEntriesOfTypeURIAndVersion" parameterType="org.lexevs.dao.database.ibatis.parameter.PrefixedParameterTriple" resultType="registryEntry">
-     	SELECT *
+     	SELECT 
+     	registryGuid AS id,
+		activationDate,
+		baseRevision,
+		dbName,
+		dbSchemaDescription,
+		dbSchemaVersion,
+		dbURI,
+		deactivationDate,
+		fixedAtRevision,
+		isLocked,
+		lastUpdateDate,
+		prefix,
+		stagingPrefix,
+		resourceType,
+		resourceVersion,
+		resourceURI AS resourceUri,
+		status,
+		tag,
+		supplementsUri,
+		supplementsVersion
      	FROM
      		${prefix}registry registry
      	WHERE
