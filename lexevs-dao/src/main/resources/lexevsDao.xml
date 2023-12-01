@@ -479,11 +479,9 @@
      	<property name="bean" ref="resourceManager"/>
      </bean>
     
-<!--      <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">  
-   		<property name="sessionFactory" >
-    		<ref bean="registrySessionFactory"/>
- 		 </property>
-	</bean> -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">  
+   		<constructor-arg><ref bean="dataSource"/></constructor-arg>
+	</bean>
 	
 	<bean id="defaultPrefixResolver" class="org.lexevs.dao.database.prefix.DefaultPrefixResolver">
 		<property name="systemVariables" ref="systemVariables"/> 
@@ -498,6 +496,7 @@
 	<bean id="ibatisRegistryDao" class="org.lexevs.dao.database.ibatis.registry.IbatisRegistryDao">
 		<property name="prefixResolver" ref="defaultPrefixResolver"/>
 		<property name="sqlSessionTemplate" ref="sqlSessionTemplate"/>
+		<property name="primaryKeyIncrementer" ref="primaryKeyIncrementer"/>
 	</bean>
 
 <!-- 	<bean id="hibernateTemplate" class="org.springframework.orm.hibernate5.HibernateTemplate">

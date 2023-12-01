@@ -84,7 +84,7 @@
    		FROM
    			${prefix}registryMetaData
    		WHERE
-   			id = ${param1}
+   			id = #{param1}
    </select>
    
       	
@@ -138,7 +138,8 @@
 		#{resourceUri,jdbcType=VARCHAR}, 
 		#{status,jdbcType=VARCHAR}, 
 		#{tag,jdbcType=VARCHAR}, 
-		#{supplementsUri,jdbcType=VARCHAR}
+		#{supplementsUri,jdbcType=VARCHAR},
+		#{supplementsVersion, jdbcType=VARCHAR}
 		)
   </insert>
   
