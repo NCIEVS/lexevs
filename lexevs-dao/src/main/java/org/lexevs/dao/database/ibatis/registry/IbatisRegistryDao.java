@@ -29,7 +29,7 @@ import org.springframework.util.Assert;
 /**
  * The Class IbatisRegistryDao.
  * 
- * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
+ * @author <a href="mailto:scott.bauer@nih.gov"Scott Bauer</a>
  */
 @Transactional(transactionManager = "transactionManager")
 public class IbatisRegistryDao extends AbstractIbatisDao implements RegistryDao {

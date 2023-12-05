@@ -12,10 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
-//import org.hibernate.annotations.TypeDef;
-//import org.hibernate.annotations.TypeDefs;
-//import org.hibernate.type.NumericBooleanType;
 import org.lexevs.dao.database.constants.DatabaseConstants;
 import org.lexevs.registry.service.Registry.ResourceType;
 import org.lexevs.registry.service.XmlRegistry.DBEntry;
@@ -26,13 +22,7 @@ import org.lexevs.registry.service.XmlRegistry.HistoryEntry;
  * 
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
-//@TypeDefs (
-//		{
-//			@TypeDef(
-//					name="numericBoolean", typeClass=NumericBooleanType.class
-//			)
-//		}
-//) 
+
 
 @Entity(name = "RegistryEntry")
 @Table(name=DatabaseConstants.PREFIX_PLACEHOLDER + "registry")
@@ -70,7 +60,6 @@ public class RegistryEntry {
 	private String fixedAtRevision;
 	
 	/** The is locked. */
-//	@Type(type = "numericBoolean")
 	private Boolean isLocked;
 	
 	/** The last update date. */

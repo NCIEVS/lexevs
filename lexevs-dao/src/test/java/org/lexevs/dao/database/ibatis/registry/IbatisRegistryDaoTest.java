@@ -69,6 +69,7 @@ public class IbatisRegistryDaoTest  extends AbstractTransactionalJUnit4SpringCon
 	}
 	
 	@Test
+	@Transactional
 	public void testdeleteRegistryEntry() {
 		final Timestamp activationDate = new Timestamp(1l);
 		final Timestamp deActivationDate = new Timestamp(2l);
@@ -185,47 +186,42 @@ public class IbatisRegistryDaoTest  extends AbstractTransactionalJUnit4SpringCon
 		assertNotNull(date);
 	}
 	
-//	@Test
-//	public void testGetCodingSchemeEntry() throws LBParameterException{
-//		RegistryEntry entry = new RegistryEntry();
-//		entry.setPrefix("prefix");
-//		entry.setStatus(CodingSchemeVersionStatus.ACTIVE.toString());
-//		entry.setTag("tag");
-//		entry.setResourceUri("uri");
-//		entry.setResourceVersion("version");
-//		entry.setResourceType(ResourceType.CODING_SCHEME);
-//		
-//		ibatisDao.insertRegistryEntry(entry);
-//		
-//		RegistryEntry foundEntry = ibatisDao.getRegistryEntryForUriAndVersion("uri", "version");
-//		
-//		assertNotNull(foundEntry);
-//	}
-//	
-//	/**
-//	 * Test change tag.
-//	 * 
-//	 * @throws LBParameterException the LB parameter exception
-//	 */
-//	@Test
-//	public void testChangeTag() throws LBParameterException{
-//		RegistryEntry entry = new RegistryEntry();
-//		entry.setPrefix("prefix");
-//		entry.setStatus(CodingSchemeVersionStatus.ACTIVE.toString());
-//		entry.setTag("tag");
-//		entry.setResourceUri("uri2");
-//		entry.setResourceVersion("version");
-//		entry.setResourceType(ResourceType.CODING_SCHEME);
-//
-//		ibatisDao.insertRegistryEntry(entry);
-//		
-//		entry.setTag("new tag");
-//		ibatisDao.updateRegistryEntry(entry);
-//		
-//		RegistryEntry foundEntry = ibatisDao.getRegistryEntryForUriAndVersion("uri2", "version");
-//		
-//		assertEquals("new tag", foundEntry.getTag());
-//	}
+
+	@Test
+	public void testChangeTag() throws LBParameterException{
+		
+		final Timestamp activationDate = new Timestamp(1l);
+		final Timestamp deActivationDate = new Timestamp(2l);
+		final Timestamp lastUpdateDate = new Timestamp(3l);
+		
+		RegistryEntry entry = new RegistryEntry();
+		entry.setActivationDate(activationDate);
+		entry.setBaseRevision("1");
+		entry.setDbName("db name");
+		entry.setDbSchemaDescription("LexGrid Table Schema Version 2.0");
+		entry.setDbSchemaVersion("2.0");
+		entry.setDbUri("dbUri://");
+		entry.setDeactivationDate(deActivationDate);
+		entry.setFixedAtRevision("2");
+		entry.setLastUpdateDate(lastUpdateDate);
+		entry.setPrefix("prefix");
+		entry.setStatus(CodingSchemeVersionStatus.ACTIVE.toString());
+		entry.setTag("PENDING");
+		entry.setResourceUri("uri2");
+		entry.setResourceVersion("version");
+		entry.setResourceType(ResourceType.CODING_SCHEME);
+		entry.setStatus(CodingSchemeVersionStatus.ACTIVE.toString());
+		
+
+		ibatisDao.insertRegistryEntry(entry);
+		
+		entry.setTag("");
+		ibatisDao.updateRegistryEntry(entry);
+		
+		List<RegistryEntry> entries = ibatisDao.getAllRegistryEntriesOfTypeAndURI(ResourceType.CODING_SCHEME, "uri2");
+		
+		assertEquals("", entries.get(0).getTag());
+	}
 	
 
 }
